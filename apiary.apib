@@ -331,6 +331,8 @@ Note: should call /resetFlareUserRegistrationKey AS service
     + Attributes
         + request_status (object)
             + status (string)
+            + error_code (string, optional) - MobileApp team will check the translations for the code/key
+            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
         + cms_data - empty
         + acurian_services_data
         

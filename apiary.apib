@@ -339,8 +339,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
     + Body
 
             {
-                {
-                    "request_status": {
+                "request_status": {
                     "status": "success"
                 },
                 "cms_data": {},
@@ -364,13 +363,17 @@ Note: should call /resetFlareUserRegistrationKey AS service
 + Response 409 (application/json)
 
     + Attributes
-        + other_info - ***!!!***
+        + request_status (object)
+            + status (string)
+            + error_code (string, optional) - MobileApp team will check the translations for the code/key
+            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + cms_data - empty
+        + acurian_services_data
 
     + Body
 
             {
-                {
-                    "request_status": {
+                "request_status": {
                     "status": "success"
                 },
                 "cms_data": {},
@@ -420,7 +423,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
 
 Note: should call /registerFlareUser AS service
 upon registration (after validating the token which happens separately)
-???Question???: should we issue a jwt token to auto-login you in here, i think now: YES
+???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
 
 + Request 200 (application/json)
 
@@ -1337,135 +1340,150 @@ upon registration (after validating the token which happens separately)
                         "updates": [],
                         "deletes": []
                     },
-                    "question_color_image_mapping": {
+                    "study_info": {
                         "study_id": 7176,
                         "project_code": "FLAREFUL",
-                        "questions": [{
-                                "question_code": "QS1",
-                                "question_color_image_logic": [{
-                                        "question_color_image_logic_id": 1,
-                                        "javascript_formula": "QS1 > 0 && QS1 <= 3",
-                                        "background_color": {
-                                            "gradient_color_top": "#FF0000",
-                                            "gradient_color_middle": "#00FF00",
-                                            "gradient_color_bottom": "#0000FF"
-                                        },
-                                        "text_color": "solid_color": "#000000",
-                                        "file_urls": [{
-                                                "screen_density": "android_mdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_mdpi.png"
-                                            }, {
-                                                "screen_density": "android_hdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_hdpi.png"
-                                            }, {
-                                                "screen_density": "android_xhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxxhdpi.png"
-                                            }, {
-                                                "screen_density": "ios_1x",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_1x.png"
-                                            }, {
-                                                "screen_density": "ios_2x",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_2x.png"
-                                            }, {
-                                                "screen_density": "ios_3x",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_3x.png"
-                                            }, {
-                                                "screen_density": "original",
-                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__original.png"
-                                            }
-                                        ]
-                                    }, {
-                                        "question_color_image_logic_id": 2,
-                                        "javascript_formula": "QS1 > 4 && QS1 <= 6",
-                                        "background_color": {
-                                            "solid_color": "#FF0000"
-                                        },
-                                        "text_color": "solid_color": "#000000",
-                                        "file_urls": [{
-                                                "screen_density": "android_mdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_mdpi.png"
-                                            }, {
-                                                "screen_density": "android_hdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_hdpi.png"
-                                            }, {
-                                                "screen_density": "android_xhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxxhdpi.png"
-                                            }, {
-                                                "screen_density": "ios_1x",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_1x.png"
-                                            }, {
-                                                "screen_density": "ios_2x",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_2x.png"
-                                            }, {
-                                                "screen_density": "ios_3x",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_3x.png"
-                                            }, {
-                                                "screen_density": "original",
-                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__original.png"
-                                            }
-                                        ]
-                                    }, {
-                                        "question_color_image_logic_id": 3,
-                                        "javascript_formula": "QS1 > 7 && QS1 <= 10",
-                                        "background_color": {
-                                            "gradient_color_top": "#FF0000",
-                                            "gradient_color_middle": "#00FF00",
-                                            "gradient_color_bottom": "#0000FF"
-                                        },
-                                        "text_color": "solid_color": "#000000",
-                                        "file_urls": [{
-                                                "screen_density": "android_mdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_mdpi.png"
-                                            }, {
-                                                "screen_density": "android_hdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_hdpi.png"
-                                            }, {
-                                                "screen_density": "android_xhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxhdpi.png"
-                                            }, {
-                                                "screen_density": "android_xxxhdpi",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxxhdpi.png"
-                                            }, {
-                                                "screen_density": "ios_1x",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_1x.png"
-                                            }, {
-                                                "screen_density": "ios_2x",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_2x.png"
-                                            }, {
-                                                "screen_density": "ios_3x",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_3x.png"
-                                            }, {
-                                                "screen_density": "original",
-                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__original.png"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }, {
-                                "question_code": "QS2",
-                                "question_color_image_logic": ["etc", "etc"]
-                            }, {
-                                "question_code": "QS3",
-                                "question_color_image_logic": ["etc", "etc"]
+                        "cms_study_id": 1,
+                        "avatar_trigger": "Send Flare Response",
+                        "badge_trigger": "Streak Data",
+                        "number_hours_maintain_streak_data": 48,
+                        "allow_interaction_with_app_if_in_flare": true
+                        
+                        "question_color_image_mapping": {
+                            //research if possible to make this similar to inserts/updates/deletes
+                                "questions": [      
+                                                    {
+                                                        "question_code": "QS1",
+                                                        "question_color_image_logic": [{
+                                                                "question_color_image_logic_id": 1,
+                                                                "javascript_formula": "QS1 > 0 && QS1 <= 3",
+                                                                "background_color": {
+                                                                    "gradient_color_top": "#FF0000",
+                                                                    "gradient_color_middle": "#00FF00",
+                                                                    "gradient_color_bottom": "#0000FF"
+                                                                },
+                                                                "text_color": "solid_color": "#000000",
+                                                                "file_urls": [{
+                                                                        "screen_density": "android_mdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_mdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_hdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_hdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_1x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_1x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_2x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_2x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_3x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_3x.png"
+                                                                    }, {
+                                                                        "screen_density": "original",
+                                                                        "file_url": "http://cms.com/study-1/question-1/happy-face--r__original.png"
+                                                                    }
+                                                                ]
+                                                            }, {
+                                                                "question_color_image_logic_id": 2,
+                                                                "javascript_formula": "QS1 > 4 && QS1 <= 6",
+                                                                "background_color": {
+                                                                    "solid_color": "#FF0000"
+                                                                },
+                                                                "text_color": "solid_color": "#000000",
+                                                                "file_urls": [{
+                                                                        "screen_density": "android_mdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_mdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_hdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_hdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_1x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_1x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_2x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_2x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_3x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_3x.png"
+                                                                    }, {
+                                                                        "screen_density": "original",
+                                                                        "file_url": "http://cms.com/study-1/question-1/medium-face--r__original.png"
+                                                                    }
+                                                                ]
+                                                            }, {
+                                                                "question_color_image_logic_id": 3,
+                                                                "javascript_formula": "QS1 > 7 && QS1 <= 10",
+                                                                "background_color": {
+                                                                    "gradient_color_top": "#FF0000",
+                                                                    "gradient_color_middle": "#00FF00",
+                                                                    "gradient_color_bottom": "#0000FF"
+                                                                },
+                                                                "text_color": "solid_color": "#000000",
+                                                                "file_urls": [{
+                                                                        "screen_density": "android_mdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_mdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_hdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_hdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "android_xxxhdpi",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxxhdpi.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_1x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_1x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_2x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_2x.png"
+                                                                    }, {
+                                                                        "screen_density": "ios_3x",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_3x.png"
+                                                                    }, {
+                                                                        "screen_density": "original",
+                                                                        "file_url": "http://cms.com/study-1/question-1/sad-face--r__original.png"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "question_color_image_logic_id": 4,
+                                                                "javascript_formula": "true",
+                                                                ...
+                                                            }
+                                                        ]
+                                                    }, {
+                                                        "question_code": "QS2",
+                                                        "question_color_image_logic": ["etc", "etc"]
+                                                    }, {
+                                                        "question_code": "QS3",
+                                                        "question_color_image_logic": ["etc", "etc"]
+                                                    }
+                        
+                                  ]
+                        
                             }
-
-                        ]
-
                     }
                 },
                 

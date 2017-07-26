@@ -1,0 +1,2160 @@
+FORMAT: 1A
+HOST: https://flarecmsapi.acurian.com
+
+# Flare CMS API
+
+API for communicating with the Flare CMS (which then may communicate with the Acurian Services (A.S.).
+object, array, enum, string, boolean, number
+https://github.com/apiaryio/mson
+https://help.apiary.io/
+https://help.apiary.io/api_101/mson-tutorial/
+https://github.com/apiaryio/api-blueprint/blob/master/API%20Blueprint%20Specification.md
+
+# Group Initial important W.S. calls (registration/login/etc)
+
+## /appLaunch
+### App Launch [POST]
+
+On the app launch (could be 1st launch, and every subsequent launch)
+Note: only return the pre-login keys for themes/translations here.
+Note: based on the app and version, we can figure out the prelogin Translation keys
+Note: on the 1st launch they won't send up device id, but subsequent launch will (hence how you will know if need to create a device-id or not). 
+Note: check to see if the FCM token has changed for this device-id
+
+???Question???: Should this WS have authentication like Basic since it doesnt have JWT Auth? (should the other ws requests which do have JWT Auth also have Basic Auth?)
+???Question???: Which FCM Topic registrations should happen here? (os, locale, app, version)
+Please call cms_version of apis. for example if default is not sent up, try to match up to a version. For now maybe we can always assume default() method?
+function register($cms_version){
+    if($cms_version=='default' || isDefault($cms_version) ) { register_default(); }
+    else if($cms_version!='default' || versionMatchInDB($cms_version) && functionExists('register_'. $cms_version) ) { register$cms_version(); } 
+    else { register_default(); } //no match
+}
+function register_default(){
+  register_v1(); //whats the default cms version
+}
+function register_v1(){
+  doStuff for V1...
+}
+function register_v2(){ //in future this may exist
+  doStuff for V2...
+}
+
++ Request 200 (application/json)
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string, optional) - *** provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
+        + app_last_updated_date (string, optional) - *** needs to get the latest info so supply on subsequent launches
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        
+    + Headers
+    
+            Accept-Charset: utf-8
+    
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default",
+                "preferred_screen_density": "android_mdpi"
+                "device_id": "abc123def456ghi7890jklmnopqrstuv",
+                "app_last_updated_date": "2017-05-01 23:00:00"
+            }
+    
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (object)
+            + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
+            + error_code (string, optional) - MobileApp team will check the translations for the code/key
+            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + cms_data (object)
+            + device_id (string)
+            + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
+                + theme_name (string)
+                + theme_values (object)
+                    + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + deletes (array[TranslationOrThemeKeyValueDeleteObject])
+            + translation_info (object)
+                + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
+                + translation_language (object)
+                    + lang_code (string)
+                    + lang_desc (string)
+                + translation_country (object)
+                    + country_code (string) - might be null if we using default en translation pretend
+                    + country_desc (string) - might be null if we using default en translation pretend
+                + translation_values (object)
+                    + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + deletes (array[TranslationOrThemeKeyValueDeleteObject])
+                
+    + Body
+        
+            {
+              "request_status": {
+                "status": "success"
+              },
+              "cms_data": {
+                "device_id": "abc123def456ghi7890jklmnopqrstuv",
+                "theme_info":
+                  {
+                      "theme_name": "Theme AAA",
+                      "theme_values":
+                      { 
+                        "inserts": [
+                            { "key": "app_background_color", "value":  "#FFFFFF", "type": "color_picker", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_heading_color",    "value":  "#000000", "type": "color_picker", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_button_color",     "value":  "#0000FF", "type": "color_picker", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            
+                            { "key": "app_background_image",                 "value": "https://www.acurianhealth.com/tests/flare_app/default_background.png",         "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_iOS_1x",          "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_1x.png",          "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_iOS_2x",          "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_2x.png",          "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_iOS_3x",          "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_3x.png",          "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_android_mdpi",    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_mdpi.png",    "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_android_hdpi",    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_hdpi.png",    "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_android_xhdpi",   "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xhdpi.png",   "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_android_xxhdpi",  "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xxhdpi.png",  "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_background_image_android_xxxhdpi", "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xxxhdpi.png", "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                    
+                            { "key": "app_background_image_alt", "value":    "https://www.acurianhealth.com/tests/flare_app/default_background_alt.png",       "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            
+                            { "key": "app_android_font_alt", "value":    "https://www.acurianhealth.com/tests/flare_app/Arial.ttf",          "type": "image", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_ios_font_alt",     "value":    "https://www.acurianhealth.com/tests/flare_app/ArialIOS.ttf",       "type": "image", "os": "ios",     "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            
+                            { "key": "app_heading_size", "value":  "large",                     "type": "size",          "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            
+                            { "key": "app_heading_android_custom_text", "value":  "Arial",      "type": "custom_text",   "os": "android",   "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                            { "key": "app_heading_ios_custom_text",     "value":  "ArialIOS",   "type": "custom_text",   "os": "ios",       "pre_login": true, "inserted_date": "2017-05-01 12:00:00" }
+                        ], 
+                        "updates": [
+                            { "key": "test_update_key1", "value":  "large",                     "type": "size",          "os": "android", "pre_login": true, "updated_date": "2017-05-01 12:00:00" },
+                            { "key": "test_update_key2", "value":  "large",                     "type": "size",          "os": "android", "pre_login": true, "updated_date": "2017-05-01 12:00:00" }
+                        ], 
+                        "deletes": [
+                            {"key":"test_delete_key1", "deleted_date": "2017-05-01 12:00:00"},
+                            {"key":"test_delete_key2", "deleted_date": "2017-05-01 12:00:00"}
+                        ]
+                      }
+                },
+                "translation_info": {
+                  "translation_locale_key": "en_US",
+                  "translation_language": {
+                    "lang_code": "en",
+                    "lang_desc": "English"
+                  },
+                  "translation_country": {
+                    "country_code": "US",
+                    "country_desc": "United States"
+                  },
+                  "translation_values": {
+                    "inserts": [
+                        {"key":"Welcome_mainTitle",           "value":"FLARE STUDY",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Welcome_subTitle",            "value":"Welcome!",            "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Welcome_subText",             "value":"Signup using your online screener registration information", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Welcome_termsConditionsText", "value":"Terms and Condition", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Welcome_privaryPolicy",       "value":"Privacy Policy",      "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Welcome_registerButton",      "value":"Register",            "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        
+                        {"key":"Registration_title",              "value":"New User Registration", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_name",               "value":"Name",             "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_username",           "value":"Username",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_password",           "value":"Password",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_email",              "value":"Email Id",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_phone",              "value":"Phone Number",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_registrationKey",    "value":"Registration Key", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Registration_registrationButton", "value":"Register",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"RegistrationDialog_title",        "value":"Congratulations",  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"RegistrationDialog_description",  "value":"You have successfully registered", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"RegistrationDialog_okay",         "value":"Okay",             "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        
+                        {"key":"Login_mainTitle",          "value":"FLARE STUDY",               "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_password",           "value":"Password",                  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_username",           "value":"Username",                  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_authenticateButton", "value":"LOGIN",                     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_registerButton",     "value":"NEW USER Registration",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_forgotPassword",     "value":"Forgot your password?",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Login_resetText",          "value":"Reset it",                  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        
+                        {"key":"Home_title",                         "value":"Flare Study",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_rewardsText",                   "value":"Reward Points",   "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_flareStatusText",               "value":"Flare Status",    "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_lastSiteVisitText",             "value":"Last Site Visit", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_flareNotVerifiedStatus",        "value":"Not Verified",    "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_flareReported",                 "value":"Flares Reported", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_siteVisits",                    "value":"Site Visits",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_FlareDetectionDiaglo_title",    "value":"FLARE DETECTED",  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Home_FlareDetectionDialog_contactDetailsText", "value":"Please contact site at", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        
+                        {"key":"SurveyDecisionScreen_title", "value":"How are you feeling?", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"SurveyDecisionScreen_ok",    "value":"Ok",                   "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"SurveyDecisionScreen_notOk", "value":"Not Ok",               "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        
+                        {"key":"Drawer_userName",          "value":"John Smith",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_profileText",       "value":"My Profile",     "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_homeMenu",          "value":"Home",           "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_notificationsMenu", "value":"Notifications",  "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_studyMaterialMenu", "value":"Study Material", "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_siteDetailsMenu",   "value":"Contact Site",   "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_settingsMenu",      "value":"Settings",       "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" },
+                        {"key":"Drawer_logoutMenu",        "value":"Logout",         "os": "android", "pre_login": true, "inserted_date": "2017-05-01 12:00:00" }
+                    ],
+                    "updates": [
+                        {"key":"test_update_key1",        "value":"Logout",         "os": "android", "pre_login": true, "updated_date": "2017-05-01 12:00:00" },
+                        {"key":"test_update_key2",        "value":"Logout",         "os": "android", "pre_login": true, "updated_date": "2017-05-01 12:00:00" }
+                    ], 
+                    "deletes": [
+                        {"key":"test_delete_key1", "deleted_date": "2017-05-01 12:00:00"},
+                        {"key":"test_delete_key2", "deleted_date": "2017-05-01 12:00:00"}
+                    ]
+                    
+                  }
+                }
+               },
+               "acurian_services_data": {}
+            }
+
+
+## /validateFlareActivationKey
+### Validate Flare Activation/Registration Key [POST]
+
+Note: should call /validateFlareRegistrationKey AS service
+The next call /register call should confirm its the same patient id I heard.
+Note: about app_last_updated_date being passed here: I know its passed in payload in case i need it... But mobile-app shouldn't update the app_last_updated date, i don't think this request should return cms_data
+Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" or 
+
++ Request 200 (application/json)
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
+        + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
+        + registration_key - *** is there something else that can be used if they dont have activation key?
+        
+    + Headers
+    
+            Accept-Charset: utf-8
+    
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default",                
+                "device_id": "abc123def456ghi7890jklmnopqrstuv",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "registration_key": "LMYLF6"
+            }
+
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (object)
+            + status (string)
+        + cms_data - empty
+        + acurian_services_data
+        
+    + Body
+
+            {
+              "request_status": {
+                "status": "success"
+              },
+              "cms_data": {},
+              "acurian_services_data": {
+                apiResponse: {
+                  RegistrationKeyValidation: "VALID_AND_AVAILABLE_FOR_REGISTRATION"
+                },
+                apiErrors: [{
+                    code: 200,
+                    status: "OK",
+                    message: "Registration key is valid and available for registration",
+                    moreInfo: "Registration key is valid and available for registration",
+                    httpStatus: "OK",
+                    versionInfo: "Supported"
+                  }
+                ]
+              }  
+            }
+            
+
+## /resetFlareUserRegistrationKey
+### Reset (and possibly Generate) Flare Patient Registration Key
+
+Note: should call /resetFlareUserRegistrationKey AS service
+
++ Request 200 (application/json)
+
+    + Attributes
+        + first_name (required)
+        + last_name (required)
+        + dob (required)
+        + address_1 (required)
+        + zip_code (required)
+        + email (required)
+        + phone_number (required) - thought it was optional, but looks required. maybe ask for this if can't find patient?
+
+    + Body 
+
+            {
+                "first_name": "Acurian",
+                "last_name":"Trial",
+                "dob":"26-03-1973",
+                "phone_number":"123-456-7890",
+                "zip_code":"19044",
+                "email":"sample@acurian.com",
+                "address_1":"Street 12"
+            }
+
+    
++ Response 200 (application/json)
+    
+    + Attributes
+        + request_status (object)
+            + status (string)
+        + cms_data - empty
+        + acurian_services_data
+        
+    + Body
+
+            {
+                {
+                    "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        uniqueId: "7JT2U8"
+                    },
+                    apiErrors: [
+                        {
+                            code: 200,
+                            status: "Success",
+                            message: "Success",
+                            moreInfo: "Success",
+                            httpStatus: "OK",
+                            versionInfo: "Supported"
+                        }
+                    ]
+                }
+            }
+
++ Response 409 (application/json)
+
+    + Attributes
+        + other_info - ***!!!***
+
+    + Body
+
+            {
+                {
+                    "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        patientInfo: {
+                            flareUserId: 0,
+                            emailId: "sample@acurian.com",
+                            phoneNumber: "123-456-7890",
+                            password: null,
+                            registrationKey: null,
+                            languagePref: null,
+                            studyId: -1,
+                            textPref: null,
+                            phonePref: null,
+                            emailPref: null,
+                            surveyFreq: null,
+                            notifFreq: null,
+                            patientId: 0,
+                            oldPassword: null,
+                            newPassword: null,
+                            status: null,
+                            firstName: "Acurian",
+                            lastName: "Trial",
+                            projectCode: null,
+                            registrationKeyExpired: null,
+                            site: null,
+                            metaData: null,
+                            dob: "26-03-1973",
+                            zipCode: "19044",
+                            streetAddress: "Street 12"
+                        }
+                    },
+                    apiErrors: [{
+                        code: 409,
+                        status: "Conflict",
+                        message: "Patient already registered",
+                        moreInfo: "Patient already registered",
+                        httpStatus: "OK",
+                        versionInfo: "Supported"
+                    }]
+                }
+            }
+
+## /register
+### Register [POST]
+
+Note: should call /registerFlareUser AS service
+upon registration (after validating the token which happens separately)
+???Question???: should we issue a jwt token to auto-login you in here, i think now: YES
+
++ Request 200 (application/json)
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string) - provide since already done on app 1st launch
+        + app_last_updated_date (string) - needs to get the latest info
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + activation_key - *** is there something else that can be used if they dont have activation key?
+        + email (string, required) - *** email from 
+        + password (string, optional) - ***
+    
+    + Headers
+    
+            Accept-Charset: utf-8
+    
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "activation_key": "usertypingsomething",
+                "email": "test@hotmail.com",
+                "phone_number": "abc1234"
+                "password": "password@2!$test"
+            }
+    
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (object)
+            + status (string)
+        + otherInfo - ***!!!***
+        
+    + Body
+
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {
+                    "theme_info": {
+                        "theme_id": 1,
+                        "theme_name": "Theme AAA",
+                        "theme_values": {
+                            "inserts": [{
+                                    "key": "app_background_color",
+                                    "value": "#FFFFFF",
+                                    "type": "color_picker",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_heading_color",
+                                    "value": "#000000",
+                                    "type": "color_picker",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_button_color",
+                                    "value": "#0000FF",
+                                    "type": "color_picker",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/default_background.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "original",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_iOS_1x",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_1x.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "ios_1x",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_iOS_2x",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_2x.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "ios_2x",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_iOS_3x",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/ios_background_3x.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "ios_3x",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_android_mdpi",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_mdpi.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "android_mdpi",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_android_hdpi",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_hdpi.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "android_hdpi",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_android_xhdpi",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xhdpi.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "android_xhdpi",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_android_xxhdpi",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xxhdpi.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "android_xxhdpi",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_android_xxxhdpi",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/android_background_xxxhdpi.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "android_xxxhdpi",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_background_image_alt",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/default_background_alt.png",
+                                    "type": "image",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "resolution": "original",
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                },
+                                {
+                                    "key": "app_android_font_alt",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/Arial.ttf",
+                                    "type": "file",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_ios_font_alt",
+                                    "value": "https://www.acurianhealth.com/tests/flare_app/ArialIOS.ttf",
+                                    "type": "file",
+                                    "os": "ios",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                },
+                                {
+                                    "key": "app_heading_size",
+                                    "value": "large",
+                                    "type": "size",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_heading_android_custom_text",
+                                    "value": "Arial",
+                                    "type": "custom_text",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "app_heading_ios_custom_text",
+                                    "value": "ArialIOS",
+                                    "type": "custom_text",
+                                    "os": "ios",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }
+                            ],
+                            "updates": [{
+                                    "key": "test_update_key1",
+                                    "value": "large",
+                                    "type": "size",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "updated_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "test_update_key2",
+                                    "value": "large",
+                                    "type": "size",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "updated_date": "2017-05-01 12:00:00"
+                                }
+                            ],
+                            "deletes": [{
+                                    "key": "test_delete_key1",
+                                    "deleted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "test_delete_key2",
+                                    "deleted_date": "2017-05-01 12:00:00"
+                                }
+                            ]
+                        }
+                    },
+                    "translation_info": {
+                        "translation_group_id": 1
+                        "translation_locale_key": "en_US",
+                        "translation_language": {
+                            "lang_code": "en",
+                            "lang_desc": "English"
+                        },
+                        "translation_country": {
+                            "country_code": "US",
+                            "country_desc": "United States"
+                        },
+                        "translation_values": {
+                            "inserts": [{
+                                    "key": "Welcome_mainTitle",
+                                    "value": "FLARE STUDY",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Welcome_subTitle",
+                                    "value": "Welcome!",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Welcome_subText",
+                                    "value": "Signup using your online screener registration information",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Welcome_termsConditionsText",
+                                    "value": "Terms and Condition",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Welcome_privaryPolicy",
+                                    "value": "Privacy Policy",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Welcome_registerButton",
+                                    "value": "Register",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_title",
+                                    "value": "New User Registration",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_name",
+                                    "value": "Name",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_username",
+                                    "value": "Username",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_password",
+                                    "value": "Password",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_email",
+                                    "value": "Email Id",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_phone",
+                                    "value": "Phone Number",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_registrationKey",
+                                    "value": "Registration Key",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Registration_registrationButton",
+                                    "value": "Register",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "RegistrationDialog_title",
+                                    "value": "Congratulations",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "RegistrationDialog_description",
+                                    "value": "You have successfully registered",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "RegistrationDialog_okay",
+                                    "value": "Okay",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_mainTitle",
+                                    "value": "FLARE STUDY",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_password",
+                                    "value": "Password",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_username",
+                                    "value": "Username",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_authenticateButton",
+                                    "value": "LOGIN",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_registerButton",
+                                    "value": "NEW USER Registration",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_forgotPassword",
+                                    "value": "Forgot your password?",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Login_resetText",
+                                    "value": "Reset it",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_title",
+                                    "value": "Flare Study",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_rewardsText",
+                                    "value": "Reward Points",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_flareStatusText",
+                                    "value": "Flare Status",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_lastSiteVisitText",
+                                    "value": "Last Site Visit",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_flareNotVerifiedStatus",
+                                    "value": "Not Verified",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_flareReported",
+                                    "value": "Flares Reported",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_siteVisits",
+                                    "value": "Site Visits",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_FlareDetectionDiaglo_title",
+                                    "value": "FLARE DETECTED",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Home_FlareDetectionDialog_contactDetailsText",
+                                    "value": "Please contact site at",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "SurveyDecisionScreen_title",
+                                    "value": "How are you feeling?",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "SurveyDecisionScreen_ok",
+                                    "value": "Ok",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "SurveyDecisionScreen_notOk",
+                                    "value": "Not Ok",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_userName",
+                                    "value": "John Smith",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_profileText",
+                                    "value": "My Profile",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_homeMenu",
+                                    "value": "Home",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_notificationsMenu",
+                                    "value": "Notifications",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_studyMaterialMenu",
+                                    "value": "Study Material",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_siteDetailsMenu",
+                                    "value": "Contact Site",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_settingsMenu",
+                                    "value": "Settings",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "Drawer_logoutMenu",
+                                    "value": "Logout",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "inserted_date": "2017-05-01 12:00:00"
+                                }
+                            ],
+                            "updates": [{
+                                    "key": "test_update_key1",
+                                    "value": "Logout",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "updated_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "test_update_key2",
+                                    "value": "Logout",
+                                    "os": "android",
+                                    "pre_login": true,
+                                    "updated_date": "2017-05-01 12:00:00"
+                                }
+                            ],
+                            "deletes": [{
+                                    "key": "test_delete_key1",
+                                    "deleted_date": "2017-05-01 12:00:00"
+                                }, {
+                                    "key": "test_delete_key2",
+                                    "deleted_date": "2017-05-01 12:00:00"
+                                }
+                            ]
+
+                        }
+                    },
+                    "study_materials": {
+                        "inserts": [{
+                                "study_material_id": 1,
+                                "title": "External Intro Video",
+                                "type": "external_url_resource",
+                                "file_url": "http://youtube.com/?v=123",
+                                "pre_download_resource": false,
+                                "section_category": "Videos"
+                            }, {
+                                "study_material_id": 2,
+                                "title": "Internal Intro Video",
+                                "type": "internal_cms_file_resource",
+                                "file_url": "http://cms.com/files/study-materials/study-1/study-materials-1/video.avi",
+                                "pre_download_resource": true,
+                                "section_category": "Videos"
+                            }, {
+                                "study_material_id": 3,
+                                "title": "Big Powerpoint File",
+                                "type": "internal_cms_file_resource",
+                                "file_url": "http://cms.com/files/study-materials/study-1/study-materials-2/big-powerpoint.ppt",
+                                "pre_download_resource": false,
+                                "section_category": "Documents"
+                            }
+                        ],
+                        "updates": [],
+                        "deletes": []
+                    },
+                    "app_materials": {
+                        "inserts": [{
+                                "app_material_id": 1,
+                                "title": "External Intro Video",
+                                "type": "external_url_resource",
+                                "file_url": "http://youtube.com/?v=123",
+                                "pre_download_resource": false,
+                                "section_category": "Videos"
+                            }, {
+                                "app_material_id": 2,
+                                "title": "Internal Intro Video",
+                                "type": "internal_cms_file_resource",
+                                "file_url": "http://cms.com/files/study-materials/study-1/study-materials-1/video.avi",
+                                "pre_download_resource": true,
+                                "section_category": "Videos"
+                            }, {
+                                "app_material_id": 3,
+                                "title": "Big Powerpoint File",
+                                "type": "internal_cms_file_resource",
+                                "file_url": "http://cms.com/files/study-materials/study-1/study-materials-2/big-powerpoint.ppt",
+                                "pre_download_resource": false,
+                                "section_category": "Documents"
+                            }
+                        ],
+                        "updates": [],
+                        "deletes": []
+                    },
+
+                    "avatars": {
+                        "avatar_group_id": 1,
+                        "avatar_group_name": "Avatar Origami - Short Study",
+                        "inserts": [{
+                                "avatar_id": 1,
+                                "avatar_name": "Bird Origami",
+                                "order": 1,
+                                "pieces": [{
+                                        "piece_name": "outline",
+                                        "true_index": 1,
+                                        "index": 0.0,
+                                        "file_urls": [{
+                                                "avatar_image_id":1,
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__android_mdpi.png"
+                                            }, {
+                                                "avatar_image_id":2,
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__android_hdpi.png"
+                                            }, {
+                                                "avatar_image_id":3,
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__android_xhdpi.png"
+                                            }, {
+                                                "avatar_image_id":4,
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__android_xxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":5,
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__android_xxxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":6,
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__ios_1x.png"
+                                            }, {
+                                                "avatar_image_id":7,
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__ios_2x.png"
+                                            }, {
+                                                "avatar_image_id":8,
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__ios_3x.png"
+                                            }, {
+                                                "avatar_image_id":9,
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__1--i__0.0--n__Bird--d__outline--r__original.png"
+                                            }
+                                        ]
+                                    }, {
+                                        "piece_name": "peice_1",
+                                        "true_index": 2,
+                                        "index": 0.5,
+                                        "file_urls": [{
+                                                "avatar_image_id":10,
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__android_mdpi.png"
+                                            }, {
+                                                "avatar_image_id":11,
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__android_hdpi.png"
+                                            }, {
+                                                "avatar_image_id":12,
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__android_xhdpi.png"
+                                            }, {
+                                                "avatar_image_id":13,
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__android_xxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":14,
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__android_xxxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":15,
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__ios_1x.png"
+                                            }, {
+                                                "avatar_image_id":16,
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__ios_2x.png"
+                                            }, {
+                                                "avatar_image_id":17,
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__ios_3x.png"
+                                            }, {
+                                                "avatar_image_id":18,
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__2--i__0.5--n__Bird--d__piece_1--r__original.png"
+                                            }
+                                        ]
+                                    }, {
+                                        "piece_name": "outline_w_piece_1",
+                                        "true_index": 3,
+                                        "index": 1.0,
+                                        "file_urls": [{
+                                                "avatar_image_id":19,
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__android_hdpi.png"
+                                            }, {
+                                                "avatar_image_id":20,
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__android_hdpi.png"
+                                            }, {
+                                                "avatar_image_id":21,
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__android_xhdpi.png"
+                                            }, {
+                                                "avatar_image_id":22,
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__android_xxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":23,
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__android_xxxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":24,
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__ios_1x.png"
+                                            }, {
+                                                "avatar_image_id":25,
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__ios_2x.png"
+                                            }, {
+                                                "avatar_image_id":26,
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__ios_3x.png"
+                                            }, {
+                                                "avatar_image_id":27,
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__3--i__1.0--n__Bird--d__outline_w_piece_1--r__original.png"
+                                            }
+                                        ]
+                                    }, {
+                                        "piece_name": "peice_2",
+                                        "true_index": 4,
+                                        "index": 1.5,
+                                        "file_urls": [{
+                                                "avatar_image_id":28,
+                                                "avatar_image_id": 1,
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_mdpi.png"
+                                            }, {
+                                                "avatar_image_id":29,
+                                                "avatar_image_id": 2,
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_hdpi.png"
+                                            }, {
+                                                "avatar_image_id":30,
+                                                "avatar_image_id": 3,
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xhdpi.png"
+                                            }, {
+                                                "avatar_image_id":31,
+                                                "avatar_image_id": 4,
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":32,
+                                                "avatar_image_id": 5,
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xxxhdpi.png"
+                                            }, {
+                                                "avatar_image_id":33,
+                                                "avatar_image_id": 6,
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_1x.png"
+                                            }, {
+                                                "avatar_image_id":34,
+                                                "avatar_image_id": 7,
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_2x.png"
+                                            }, {
+                                                "avatar_image_id":35,
+                                                "avatar_image_id": 8,
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_3x.png"
+                                            }, {
+                                                "avatar_image_id":36,
+                                                "avatar_image_id": 9,
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__original.png"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }, {
+                                "avatar_id": 2,
+                                "avatar_name": "Monkey Origami",
+                                "order": 2,
+                                "pieces": ["etc", "etc"]
+                            }, {
+                                "avatar_id": 2,
+                                "avatar_name": "Giraffe Origami",
+                                "order": 2,
+                                "pieces": ["etc", "etc"]
+                            }
+                        ],
+                        "updates": [],
+                        "deletes": []
+                    },
+                    "badges": {
+                        "badge_group_id": 1,
+                        "badge_group_name": "Trophy Badges",
+                        "inserts": [{
+                                "badge_id": 1,
+                                "badge_name": "Bronze Trophy",
+                                "streak_days_to_win": 1,
+                                "file_urls": [{
+                                        "badge_image_id": 1,
+                                        "screen_density": "android_mdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__android_mdpi.png"
+                                    }, {
+                                        "badge_image_id": 2,
+                                        "screen_density": "android_hdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__android_hdpi.png"
+                                    }, {
+                                        "badge_image_id": 3,
+                                        "screen_density": "android_xhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__android_xhdpi.png"
+                                    }, {
+                                        "badge_image_id": 4,
+                                        "screen_density": "android_xxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__android_xxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 5,
+                                        "screen_density": "android_xxxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__android_xxxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 6,
+                                        "screen_density": "ios_1x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__ios_1x.png"
+                                    }, {
+                                        "badge_image_id": 7,
+                                        "screen_density": "ios_2x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__ios_2x.png"
+                                    }, {
+                                        "badge_image_id": 8,
+                                        "screen_density": "ios_3x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__ios_3x.png"
+                                    }, {
+                                        "badge_image_id": 9,
+                                        "screen_density": "original",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Bronze_Trophy--r__original.png"
+                                    }
+                                ]
+                            }, {
+                                "badge_id": 2,
+                                "badge_name": "Silver Trophy",
+                                "streak_days_to_win": 3,
+                                "file_urls": [{
+                                        "badge_image_id": 10,
+                                        "screen_density": "android_mdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__android_mdpi.png"
+                                    }, {
+                                        "badge_image_id": 11,
+                                        "screen_density": "android_hdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__android_hdpi.png"
+                                    }, {
+                                        "badge_image_id": 12,
+                                        "screen_density": "android_xhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__android_xhdpi.png"
+                                    }, {
+                                        "badge_image_id": 13,
+                                        "screen_density": "android_xxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__android_xxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 14,
+                                        "screen_density": "android_xxxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__android_xxxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 15,
+                                        "screen_density": "ios_1x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__ios_1x.png"
+                                    }, {
+                                        "badge_image_id": 16,
+                                        "screen_density": "ios_2x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__ios_2x.png"
+                                    }, {
+                                        "badge_image_id": 17,
+                                        "screen_density": "ios_3x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__ios_3x.png"
+                                    }, {
+                                        "badge_image_id": 18,
+                                        "screen_density": "original",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Silver_Trophy--r__original.png"
+                                    }
+                                ]
+                            }, {
+                                "badge_id": 3,
+                                "badge_name": "Gold Trophy",
+                                "streak_days_to_win": 5,
+                                "file_urls": [{
+                                        "badge_image_id": 19,
+                                        "screen_density": "android_mdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__android_mdpi.png"
+                                    }, {
+                                        "badge_image_id": 20,
+                                        "screen_density": "android_hdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__android_hdpi.png"
+                                    }, {
+                                        "badge_image_id": 21,
+                                        "screen_density": "android_xhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__android_xhdpi.png"
+                                    }, {
+                                        "badge_image_id": 22,
+                                        "screen_density": "android_xxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__android_xxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 23,
+                                        "screen_density": "android_xxxhdpi",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__android_xxxhdpi.png"
+                                    }, {
+                                        "badge_image_id": 24,
+                                        "screen_density": "ios_1x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__ios_1x.png"
+                                    }, {
+                                        "badge_image_id": 25,
+                                        "screen_density": "ios_2x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__ios_2x.png"
+                                    }, {
+                                        "badge_image_id": 26,
+                                        "screen_density": "ios_3x",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__ios_3x.png"
+                                    }, {
+                                        "badge_image_id": 27,
+                                        "screen_density": "original",
+                                        "file_url": "http://cms.com/badge-group-1/badge-1/name__Gold_Trophy--r__original.png"
+                                    }
+                                ]
+                            }
+                        ],
+                        "updates": [],
+                        "deletes": []
+                    },
+                    "question_color_image_mapping": {
+                        "study_id": 7176,
+                        "project_code": "FLAREFUL",
+                        "questions": [{
+                                "question_code": "QS1",
+                                "question_color_image_logic": [{
+                                        "question_color_image_logic_id": 1,
+                                        "javascript_formula": "QS1 > 0 && QS1 <= 3",
+                                        "background_color": {
+                                            "gradient_color_top": "#FF0000",
+                                            "gradient_color_middle": "#00FF00",
+                                            "gradient_color_bottom": "#0000FF"
+                                        },
+                                        "text_color": "solid_color": "#000000",
+                                        "file_urls": [{
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_mdpi.png"
+                                            }, {
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_hdpi.png"
+                                            }, {
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_xxxhdpi.png"
+                                            }, {
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_1x.png"
+                                            }, {
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_2x.png"
+                                            }, {
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__ios_3x.png"
+                                            }, {
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/study-1/question-1/happy-face--r__original.png"
+                                            }
+                                        ]
+                                    }, {
+                                        "question_color_image_logic_id": 2,
+                                        "javascript_formula": "QS1 > 4 && QS1 <= 6",
+                                        "background_color": {
+                                            "solid_color": "#FF0000"
+                                        },
+                                        "text_color": "solid_color": "#000000",
+                                        "file_urls": [{
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_mdpi.png"
+                                            }, {
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_hdpi.png"
+                                            }, {
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_xxxhdpi.png"
+                                            }, {
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_1x.png"
+                                            }, {
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_2x.png"
+                                            }, {
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__ios_3x.png"
+                                            }, {
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/study-1/question-1/medium-face--r__original.png"
+                                            }
+                                        ]
+                                    }, {
+                                        "question_color_image_logic_id": 3,
+                                        "javascript_formula": "QS1 > 7 && QS1 <= 10",
+                                        "background_color": {
+                                            "gradient_color_top": "#FF0000",
+                                            "gradient_color_middle": "#00FF00",
+                                            "gradient_color_bottom": "#0000FF"
+                                        },
+                                        "text_color": "solid_color": "#000000",
+                                        "file_urls": [{
+                                                "screen_density": "android_mdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_mdpi.png"
+                                            }, {
+                                                "screen_density": "android_hdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_hdpi.png"
+                                            }, {
+                                                "screen_density": "android_xhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxhdpi.png"
+                                            }, {
+                                                "screen_density": "android_xxxhdpi",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_xxxhdpi.png"
+                                            }, {
+                                                "screen_density": "ios_1x",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_1x.png"
+                                            }, {
+                                                "screen_density": "ios_2x",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_2x.png"
+                                            }, {
+                                                "screen_density": "ios_3x",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__ios_3x.png"
+                                            }, {
+                                                "screen_density": "original",
+                                                "file_url": "http://cms.com/study-1/question-1/sad-face--r__original.png"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }, {
+                                "question_code": "QS2",
+                                "question_color_image_logic": ["etc", "etc"]
+                            }, {
+                                "question_code": "QS3",
+                                "question_color_image_logic": ["etc", "etc"]
+                            }
+
+                        ]
+
+                    }
+                },
+                
+                "acurian_services_data": {
+                    "patient_info": {
+                        "apiResponse": {
+                            "FlareUser": {
+                                "flareUserId": 289,
+                                "emailId": "armyofda12mnkeys+4@gmail.com",
+                                "phoneNumber": null,
+                                "password": "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83CZfSvz6OKrGTlcSwY/0VamkT7Fkrzs/9+M8YQ2Xrm0drN8Jc9AsXXRwdQBiwbFx2Mm0jBInnFBEHIFd7pMPKXl",
+                                "registrationKey": "TG4M7H",
+                                "languagePref": "en_US",
+                                "studyId": 7176,
+                                "textPref": true,
+                                "phonePref": true,
+                                "emailPref": true,
+                                "surveyFreq": "DAILY",
+                                "notifFreq": "WEEKLY",
+                                "patientId": 60938249,
+                                "oldPassword": "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83CZfSvz6OKrGTlcSwY/0VamkT7Fkrzs/9+M8YQ2Xrm0drN8Jc9AsXXRwdQBiwbFx2Mm0jBInnFBEHIFd7pMPKXl",
+                                "newPassword": null,
+                                "status": "ACTIVE",
+                                "firstName": "Acurian",
+                                "lastName": "Trial",
+                                "projectCode": "FLAREFUL",
+                                "registrationKeyExpired": true,
+                                "site": {
+                                    "facilityName": "Abbot",
+                                    "address1": "address 1",
+                                    "address2": null,
+                                    "city": "Horsham",
+                                    "state": "PA",
+                                    "zipCode": "19044",
+                                    "zipExt": null,
+                                    "country": "US",
+                                    "timeZoneCd": "EST",
+                                    "latitude": 40.1905662,
+                                    "longitude": -75.1466602,
+                                    "language": "en",
+                                    "siteInvestigatorInfo": {
+                                        "firstName": null,
+                                        "lastName": null,
+                                        "phoneNumber": null,
+                                        "phoneExt": null,
+                                        "faxNumber": null,
+                                        "email": "ramesh.verala@acurian.com"
+                                    }
+                                },
+                                "metaData": {
+                                    "version": "0.0.1",
+                                    "date": "Wed Jun 28 15:38:00 EDT 2017"
+                                },
+                                "dob": null,
+                                "zipCode": null,
+                                "streetAddress": null
+                            }
+                        },
+                        "apiErrors": [{
+                                "code": 201,
+                                "status": "Created",
+                                "message": "Successfully registered",
+                                "moreInfo": "Successfully registered",
+                                "httpStatus": "OK",
+                                "versionInfo": "Supported"
+                            }
+                        ]
+                    },
+                    "survey_info": {
+                        "apiResponse": {
+                            "FlareSurvey": {
+                                "languagePref": "en_US",
+                                "flareStudyId": 7176,
+                                "level": "1",
+                                "projectCode": "FLAREFUL",
+                                "followUpStudyId": 7158,
+                                "followUpProjectCode": "FLARE1M",
+                                "patientId": 60938249,
+                                "oldPatientId": null,
+                                "originalPatientId": null,
+                                "questionList": [{
+                                        "questionCd": "Q0012577",
+                                        "questionText": "On an average day, how many total bowel movements do you have?",
+                                        "questionType": "Text Number Field",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": true,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "On an average day, how many total bowel movements do you have?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS1",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 1,
+                                        "questionnaireElementId": 55002,
+                                        "blockerLogic": [{
+                                                "comparisonText": "(1==1)",
+                                                "logicOrderNum": 1
+                                            }
+                                        ],
+                                        "optionsList": []
+                                    }, {
+                                        "questionCd": "Q0012578",
+                                        "questionText": "In the past 24 hours, how many total bowel movements did you have?",
+                                        "questionType": "Text Number Field",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": true,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "In the past 24 hours, how many total bowel movements did you have?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS2",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 2,
+                                        "questionnaireElementId": 55003,
+                                        "blockerLogic": [{
+                                                "comparisonText": "(QS1<4)",
+                                                "logicOrderNum": 1
+                                            }
+                                        ],
+                                        "optionsList": []
+                                    }, {
+                                        "questionCd": "Q0012579",
+                                        "questionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionType": "Radio",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": false,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS3",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 3,
+                                        "questionnaireElementId": 55004,
+                                        "blockerLogic": null,
+                                        "optionsList": [{
+                                                "optionId": "Y",
+                                                "optionText": "Yes",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 1
+                                            }, {
+                                                "optionId": "N",
+                                                "optionText": "No",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 2
+                                            }
+                                        ]
+                                    }, {
+                                        "questionCd": "Q0012621",
+                                        "questionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionType": "Radio",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": false,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS4",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 4,
+                                        "questionnaireElementId": 55382,
+                                        "blockerLogic": null,
+                                        "optionsList": [{
+                                                "optionId": "Y",
+                                                "optionText": "Yes",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 1
+                                            }, {
+                                                "optionId": "N",
+                                                "optionText": "No",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 2
+                                            }
+                                        ]
+                                    }, {
+                                        "questionCd": "Q0012622",
+                                        "questionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionType": "Radio",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": false,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS5",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 5,
+                                        "questionnaireElementId": 55383,
+                                        "blockerLogic": null,
+                                        "optionsList": [{
+                                                "optionId": "Y",
+                                                "optionText": "Yes",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 1
+                                            }, {
+                                                "optionId": "N",
+                                                "optionText": "No",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 2
+                                            }
+                                        ]
+                                    }, {
+                                        "questionCd": "Q0012623",
+                                        "questionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionType": "Radio",
+                                        "questionBgImageUrl": null,
+                                        "maxScaleValue": 0,
+                                        "blocker": false,
+                                        "viewType": null,
+                                        "baseLine": false,
+                                        "alternateQuestionText": "Over the past 24 hours, did you notice any blood in your stool, on toilet tissue, or in the toilet bowl?",
+                                        "questionnaireGroupAttributeCd": "STUDYQUES",
+                                        "questionnaireElementUniqueCd": "QS6",
+                                        "questionnaireRequiredInd": true,
+                                        "questionnaireElementOrderNum": 6,
+                                        "questionnaireElementId": 55384,
+                                        "blockerLogic": null,
+                                        "optionsList": [{
+                                                "optionId": "Y",
+                                                "optionText": "Yes",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 1
+                                            }, {
+                                                "optionId": "N",
+                                                "optionText": "No",
+                                                "optionBgImageUrl": null,
+                                                "optionIndex": 2
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "logicSet": [{
+                                        "comparisonText": "((QS1 >= 4) && ((QS2-QS1) >= 1) || (QS3==\"Y\"))",
+                                        "logicOrderNum": 1
+                                    }
+                                ]
+                            }
+                        },
+                        "apiErrors": [{
+                                "code": 200,
+                                "status": "Success",
+                                "message": "Success",
+                                "moreInfo": "Success",
+                                "httpStatus": "OK",
+                                "versionInfo": "Supported"
+                            }
+                        ]
+                    }
+
+                }
+                
+            }
+
+
+## /login
+### Login [POST]
+
+Note: should authenticate user and issue jwt token
+Note: Get all the data as mobile-team has wiped clean!!!
+    so should call /??? AS service to get more data from AS? (prob needs to get the Survey Questions, and Patient Profile and Patient Status... )
+Note: and CMS should return the usual data all in inserts array since starting from scratch (if logout, mobile-app data is wiped out... minus device-id i think)
+
++ Request 200 (application/json)
+    
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string) - provide since already done on app 1st launch
+        + app_last_updated_date (string) - needs to get the latest info
+        + email
+        + password
+
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (object)
+            + status (string)
+
+    + Body
+    
+            {
+                "test": true
+            }
+  
+            
+
+    
++ Response 200 (application/json)
+
+            {
+                 "test": true
+            }
+
+## /authorization
+### Authorization [POST]
+
+Note: if jwt token is valid, return any updated data
+
++ Request 200 (application/json)
+
+        {
+            "OS", "android",
+            "locale", "en_US",
+            "fcm_token", "abc123..."
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+        
+    
+# Group Password Group
+
+## /changePassword
+### Change Password [POST]
+
+Note: should call /changeFlareUserPwd AS service
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+## /resetPassword
+### Reset Password [POST]
+
+Note: should call /resetFlareUserPwd AS service
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+# Group Other important Group
+
+## /sendUserTracking
+### send User Tracking [POST]
+event category button-click, screen-view... need to define these
+event 1, id-of-button, name-of-screen-view
+event 2, not sure
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+## /sendFlareResponse
+### send Flare Response [POST]
+
+
++ Request (application/json)
+
+    + Attributes
+        + jwt_token (string) - test
+        + locale (string) - test
+        + fcm_token (string) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + flare_user_id (number) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + flare_responses (array[FlareResponse]) - test
+
+    + Body
+
+
+            {
+                "jwt_token": "abc123",
+                "locale": "locale",
+                "fcm_token": "def456",
+                "patient_id": 101010101,
+                "flare_user_id": 101,
+                "device_id": "ghi789",
+                "app_last_updated_date": "2017-05-14 13:00:00",
+                "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
+                /* check to see if always eval the score: "patient_profile_score": 80 */,
+                "flare_responses": [ 
+                    {
+                      "submission_order": 1,
+                      "submission_date": "2017-05-21 13:00:00",
+                      "answers": [
+                        {
+                          question_cd: "QS1",
+                          question_type: "radio",
+                          view_type: "view1",
+                          answer_value: "4",
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS2",
+                          question_type: "radio",
+                          view_type: "default",
+                          answer_value: "B",
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS3",
+                          question_type: "checkbox",
+                          view_type: "default",
+                          answer_value: null,
+                          answer_value_list: ["A", "4", "B", "5"]
+                        },
+                        {
+                          question_cd: "QS4",
+                          question_type: "number",
+                          view_type: "default",
+                          answer_value: 200,
+                          answer_value_list: null
+                        }
+                      ],
+                    },
+                    {
+                      "submission_order": 2,
+                      "submission_date": "2017-05-22 13:00:00",
+                      "answers": [
+                        {
+                          question_cd: "QS1",
+                          question_type: "radio",
+                          view_type: "view1",
+                          answer_value: 5,
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS2",
+                          question_type: "radio",
+                          view_type: "default",
+                          answer_value: "C",
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS3",
+                          question_type: "checkbox",
+                          view_type: "default",
+                          answer_value: null,
+                          answer_value_list: ["A", "4"]
+                        },
+                        {
+                          question_cd: "QS4",
+                          question_type: "number",
+                          view_type: "default",
+                          answer_value: 333,
+                          answer_value_list: null
+                        }
+                      ],
+                    }
+                  ]
+            }
+
+
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+# Group Reporting/Spectrum Graph web services
+
+##/getFlareUserSpectrumGraph
+### Get Flare User's Spectrum Graph
+
+##/getFlareUserAnswers
+### Get Flare User's Answers
+
+
+
+
+# Group CMS apis for the CMS Admin GUI
+
+## /getFlareMatchingStudies
+### Get Flare Matching Studies [POST]
+
+Note: should call /getFlareMatchingStudy/{partialProjectCode} AS service
+This is for CMS's 'Add/Edit Study' area
+
+
++ Request 200 (application/json)
+
+    + Attributes
+        + partial_project_code (string) - test
+
+    + Body
+    
+            {
+                "test": true
+            }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+## /importQuestions
+### Import Questions [POST]
+
+This is for CMS's 'Import Question' area. Already done, so url path may be different. Check with CMS Team.
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+# Group Other Web Services
+
+##/sendPushNotification
+### Send Push Notifications [POST]
+
+find locale of the patient + find the translation group of his study which help figure out which message to serve him.
+
++ Request 200 (application/json)
+
+    + Attributes
+        + flare_user_id (string, optional) -    one of these 3 required, #1
+        + patient_id (string, optional) -       one of these 3 required, #2
+        + email (string, optional) -            one of these 3 required, #3
+        + message (string,optional) -                 one of these 2 required, #1
+        + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
+        + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
+        + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
+        + theme_key_resolution (string, optional) -         if possible force the resolution of image to send. Not sure if this is needed, maybe we default to 'ldpi' for all ios/android?
+
+    + Body
+
+            {
+                "flare_user_id": 101,
+                "message_translation_key": "welcome_msg_to_app",
+                "priority": "normal"
+            }
+
+
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (object)
+            + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
+            + extra_info (string) - maybe for push notification, would be good to know more info
+            + error_code (string, optional) - MobileApp team will check the translations for the code/key
+            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+
+    + Body
+
+            {
+                "status": "success"
+                "extra_info": "Push notification sent to fcm token $token"
+            }
+    
+
+##/updateProfileBaselineQuestions
+### Update Profile Baseline Questions [POST]
+
+Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
+
++ Request 200 (application/json)
+
+    + Attributes
+        + jwt_token (string) - test
+        + locale (string) - test
+        + fcm_token (string) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + flare_user_id (number) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
+
+
+    + Body
+
+            {
+                "jwt_token": "abc123",
+                "locale": "locale",
+                "fcm_token": "def456",
+                "patient_id": 101010101,
+                "flare_user_id": 101,
+                "device_id": "ghi789",
+                "app_last_updated_date": "2017-05-14 13:00:00",
+                "baseline_flare_responses": [ 
+                    {
+                      "submission_order": 1,
+                      "submission_date": "2017-05-21 13:00:00",
+                      "answers": [
+                        {
+                          question_cd: "QS1",
+                          question_type: "radio",
+                          view_type: "view1",
+                          answer_value: "4",
+                          answer_value_list: null
+                        }
+                      ]
+                    }
+                ]
+            }
+    
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "status": "success",
+                "extra_info": "Baseline question(s) updated"
+            }
+    
+
+# Group TEST GROUP
+
+## /test1
+### Test1 [POST]
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+
+# Data Structures
+
+## FlareResponse (object)
++ submission_order (number) - if offline, may have more than 1 offline answer to send up
++ submission_date (string) - date of submission
++ answers (array[FlareQuestionAnswer]) - array of answers 
+
+## FlareQuestionAnswer (object)
++ question_cd (string) - test
++ question_type (string) - test
++ view_type (string) - test
++ answer_value (enum, nullable) - can be either a number key or string key (please don't add qoutes if a number)
+    - 3 (number)
+    - 'C' (string)
++ answer_value_list (array, nullable) - can be either a number key or string key (please don't add qoutes if a number in the array list)
+    - 3 (number)
+    - 'C' (string)
+
+## TranslationOrThemeKeyValueInsertOrUpdateObject
++ key (string)
++ value (string)
++ type (string)
++ os (string)
++ pre_login (string)
++ inserted_date (string, optional) - well one of these dates are required
++ updated_date (string, optional)  - well one of these dates are required
+
+## TranslationOrThemeKeyValueDeleteObject
++ key (string)
++ deleted_date (string)

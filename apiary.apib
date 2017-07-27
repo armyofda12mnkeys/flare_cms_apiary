@@ -73,10 +73,7 @@ function register_v2(){ //in future this may exist
 + Response 200 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
-            + error_code (string, optional) - MobileApp team will check the translations for the code/key
-            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + request_status (RequestStatusObject)
         + cms_data (object)
             + device_id (string)
             + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
@@ -274,10 +271,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
 + Response 200 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string)
-            + error_code (string, optional) - MobileApp team will check the translations for the code/key
-            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data
         
@@ -337,10 +331,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
 + Response 200 (application/json)
     
     + Attributes
-        + request_status (object)
-            + status (string)
-            + error_code (string, optional) - MobileApp team will check the translations for the code/key
-            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data
         
@@ -371,10 +362,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
 + Response 409 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string)
-            + error_code (string, optional) - MobileApp team will check the translations for the code/key
-            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data
 
@@ -382,7 +370,12 @@ Note: should call /resetFlareUserRegistrationKey AS service
 
             {
                 "request_status": {
-                    "status": "success"
+                    "status": "error",
+                    "errors": [ {
+                            error_code: "PATIENT_ALREADY_REGISTERED_EXCEPTION_EXAMPLE",
+                            error_message: "Patient already registered"
+                        }
+                    ] 
                 },
                 "cms_data": {},
                 "acurian_services_data": {
@@ -417,7 +410,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
                     },
                     apiErrors: [{
                         code: 409,
-                        status: "Conflict",
+                        status: "PATIENT_ALREADY_REGISTERED_EXCEPTION_EXAMPLE",
                         message: "Patient already registered",
                         moreInfo: "Patient already registered",
                         httpStatus: "OK",
@@ -474,8 +467,7 @@ upon registration (after validating the token which happens separately)
 + Response 200 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string)
+        + request_status (RequestStatusObject)
         + otherInfo - ***!!!***
         
     + Body
@@ -1351,12 +1343,15 @@ upon registration (after validating the token which happens separately)
                         "updates": [],
                         "deletes": []
                     },
+                    "app_info": {
+                        "latency_minutes": 60,
+                    }
                     "study_info": {
                         "study_id": 7176,
                         "project_code": "FLAREFUL",
                         "cms_study_id": 1,
-                        "avatar_trigger": "Send Flare Response",
-                        "badge_trigger": "Streak Data",
+                        "avatar_trigger": "Send Flare Response --Note: maybe this is an name like send_flare_response, confirm with CMS Team", 
+                        "badge_trigger": "Streak Data --Note: maybe this is an name like send_flare_response, confirm with CMS Team",
                         "number_hours_maintain_streak_data": 48,
                         "allow_interaction_with_app_if_in_flare": true
                         
@@ -1779,8 +1774,7 @@ Note: and CMS should return the usual data all in inserts array since starting f
 + Response 200 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string)
+        + request_status (RequestStatusObject)
 
     + Body
     
@@ -2072,11 +2066,7 @@ find locale of the patient + find the translation group of his study which help 
 + Response 200 (application/json)
 
     + Attributes
-        + request_status (object)
-            + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
-            + extra_info (string) - maybe for push notification, would be good to know more info
-            + error_code (string, optional) - MobileApp team will check the translations for the code/key
-            + error_message (string, optional) - "non localised error message" ... in case no translation provided, default error
+        + request_status (RequestStatusObject)
 
     + Body
 
@@ -2191,3 +2181,14 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 ## TranslationOrThemeKeyValueDeleteObject
 + key (string)
 + deleted_date (string)
+
+
+##RequestStatusObject
++ status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
++ extra_info (optional) - eh , may helpful extra info even on success like "Push Notificatioon sent to fcm token $token"
++ errors (array[ErrorObject], optional) - array of errors
+
+##ErrorObject
++ error_code (string) - MobileApp team will check the translations for the code/key
++ error_message (string) - "non localised error message" ... in case no translation provided, default error
++ error_extra_info (string, optional) - extra info maybe for push notifications, would be good to know more info

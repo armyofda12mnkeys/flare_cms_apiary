@@ -80,7 +80,11 @@ function register_v2(){ //in future this may exist
         + cms_data (object)
             + device_id (string)
             + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
+                + theme_id
                 + theme_name (string)
+                + is_inherited
+                + inherited_theme_id
+                + inherited_theme_name
                 + theme_values (object)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
@@ -108,7 +112,11 @@ function register_v2(){ //in future this may exist
                 "device_id": "abc123def456ghi7890jklmnopqrstuv",
                 "theme_info":
                   {
+                      "theme_id": 2,
                       "theme_name": "Theme AAA",
+                      "is_inherited": true,
+                      "inherited_theme_id": 2,
+                      "inherited_theme_name": "Theme A",
                       "theme_values":
                       { 
                         "inserts": [
@@ -478,8 +486,11 @@ upon registration (after validating the token which happens separately)
                 },
                 "cms_data": {
                     "theme_info": {
-                        "theme_id": 1,
+                        "theme_id": 2,
                         "theme_name": "Theme AAA",
+                        "is_inherited": true,
+                        "inherited_theme_id": 2,
+                        "inherited_theme_name": "Theme A",
                         "theme_values": {
                             "inserts": [{
                                     "key": "app_background_color",
@@ -1970,9 +1981,6 @@ event 2, not sure
 
 + Response 200 (application/json)
 
-
-    if gained any new avatars or badges?
-    
         {
             "test": true
         }

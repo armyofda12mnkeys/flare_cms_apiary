@@ -372,8 +372,9 @@ Note: should call /resetFlareUserRegistrationKey AS service
                 "request_status": {
                     "status": "error",
                     "errors": [ {
-                            error_code: "PATIENT_ALREADY_REGISTERED_EXCEPTION_EXAMPLE",
-                            error_message: "Patient already registered"
+                            "error_source": "acurian_services_error",
+                            "error_code": "PATIENT_ALREADY_REGISTERED_EXCEPTION_EXAMPLE",
+                            "error_message": "Patient already registered"
                         }
                     ] 
                 },
@@ -2247,6 +2248,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 + errors (array[ErrorObject], optional) - array of errors
 
 ##ErrorObject
++ error_source (string) - "cms_error" or "acurian_services_error"
 + error_code (string) - MobileApp team will check the translations for the code/key
 + error_message (string) - "non localised error message" ... in case no translation provided, default error
 + error_extra_info (string, optional) - extra info maybe for push notifications, would be good to know more info

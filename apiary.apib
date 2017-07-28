@@ -1344,8 +1344,8 @@ upon registration (after validating the token which happens separately)
                         "deletes": []
                     },
                     "app_info": {
-                        "latency_minutes": 60,
-                    }
+                        "latency_minutes": 60
+                    },
                     "study_info": {
                         "study_id": 7176,
                         "project_code": "FLAREFUL",
@@ -1354,6 +1354,59 @@ upon registration (after validating the token which happens separately)
                         "badge_trigger": "Streak Data --Note: maybe this is an name like send_flare_response, confirm with CMS Team",
                         "number_hours_maintain_streak_data": 48,
                         "allow_interaction_with_app_if_in_flare": true
+                        
+                        "spectrum_graph_colors": [  
+                           {  "to CMS Team": "this part of JSON is hardcoded. at some point we will make this matching to a GUI in the CMS."
+                              "index":0,
+                              "color":"#800080",
+                              "color_name":"Pink"
+                           },
+                           {  
+                              "index":1,
+                              "color":"#7433DC",
+                              "color_name":"Purple"
+                           },
+                           {  
+                              "index":2,
+                              "color":"#0000FF",
+                              "color_name":"Blue"
+                           },
+                           {  
+                              "index":3,
+                              "color":"#00BFFF",
+                              "color_name":"Cyan"
+                           },
+                           {  
+                              "index":4,
+                              "color":"#00FF00",
+                              "color_name":"Green"
+                           },
+                           {  
+                              "index":5,
+                              "color":"#FFFF00",
+                              "color_name":"Yellow"
+                           },
+                           {  
+                              "index":6,
+                              "color":"#FF4F15",
+                              "color_name":"Orange"
+                           },
+                           {  
+                              "index":7,
+                              "color":"#FF0000",
+                              "color_name":"Red"
+                           }
+                        ],
+                        
+                        "patient_profile_score": {
+                            "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
+                            "patient_profile_score_mapping": [
+                             {"score": 20, "desc": "orange", "color": "#FFA500", "translation_key": "spectrum_color_1"},
+                             {"score": 40, "desc": "yellow", "color": "#FFFF00", "translation_key": "spectrum_color_2"},
+                             {"score": 60, "desc": "green", "color": "#00FF00", "translation_key": "spectrum_color_3"},
+                             {"score": 80, "desc": "blue", "color": "#0000FF", "translation_key": "spectrum_color_4"},
+                            ],
+                        },
                         
                         "question_color_image_mapping": {
                             //research if possible to make this similar to inserts/updates/deletes
@@ -1368,7 +1421,7 @@ upon registration (after validating the token which happens separately)
                                                                     "gradient_color_middle": "#00FF00",
                                                                     "gradient_color_bottom": "#0000FF"
                                                                 },
-                                                                "text_color": "solid_color": "#000000",
+                                                                "text_color": { "solid_color": "#000000" },
                                                                 "file_urls": [{
                                                                         "screen_density": "android_mdpi",
                                                                         "file_url": "http://cms.com/study-1/question-1/happy-face--r__android_mdpi.png"
@@ -1404,7 +1457,7 @@ upon registration (after validating the token which happens separately)
                                                                 "background_color": {
                                                                     "solid_color": "#FF0000"
                                                                 },
-                                                                "text_color": "solid_color": "#000000",
+                                                                "text_color": { "solid_color": "#000000" },
                                                                 "file_urls": [{
                                                                         "screen_density": "android_mdpi",
                                                                         "file_url": "http://cms.com/study-1/question-1/medium-face--r__android_mdpi.png"
@@ -1442,7 +1495,7 @@ upon registration (after validating the token which happens separately)
                                                                     "gradient_color_middle": "#00FF00",
                                                                     "gradient_color_bottom": "#0000FF"
                                                                 },
-                                                                "text_color": "solid_color": "#000000",
+                                                                "text_color": { "solid_color": "#000000" },
                                                                 "file_urls": [{
                                                                         "screen_density": "android_mdpi",
                                                                         "file_url": "http://cms.com/study-1/question-1/sad-face--r__android_mdpi.png"
@@ -1974,10 +2027,15 @@ event 2, not sure
 
 
 + Response 200 (application/json)
+    + Attributes
+        +TODO: add the returned things here like score!!! and status etc.
 
-        {
-            "test": true
-        }
+
+    + Body
+    
+            {
+                "test": true
+            }
 
 
 # Group Reporting/Spectrum Graph web services

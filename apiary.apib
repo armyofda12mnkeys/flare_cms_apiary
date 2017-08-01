@@ -76,7 +76,7 @@ function register_v2(){ //in future this may exist
         + request_status (RequestStatusObject)
         + cms_data (object)
             + device_id (string)
-            + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
+            + theme_info (object) - return prelogin theme keys only!
                 + theme_id
                 + theme_name (string)
                 + is_inherited
@@ -86,7 +86,7 @@ function register_v2(){ //in future this may exist
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + deletes (array[TranslationOrThemeKeyValueDeleteObject])
-            + translation_info (object)
+            + translation_info (object) - return prelogin theme keys only!
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)
@@ -443,6 +443,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
 ### Register [POST]
 
 Note: should call /registerFlareUser AS service and /getFlareSurveyByProjectCode/{projectCode} AS service for the 2 objects under acurian_services_data
+Note: similar to how we filtered theme/translation keys for pre-login keys for /appLaunch, make sure to filter theme/translation keys for post-login keys for /register
 upon registration (after validating the token which happens separately)
 ???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
 
@@ -489,7 +490,7 @@ upon registration (after validating the token which happens separately)
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
-            + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
+            + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
                 + is_inherited
@@ -499,7 +500,7 @@ upon registration (after validating the token which happens separately)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + deletes (array[TranslationOrThemeKeyValueDeleteObject])
-            + translation_info (object)
+            + translation_info (object) - filter post-login translation keys only!
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)
@@ -1903,6 +1904,7 @@ Note: and CMS should return the usual data all in inserts array since starting f
         + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
         + device_id (string) - provide since already done on app 1st launch
         + app_last_updated_date (string) - needs to get the latest info
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)n
         + email
         + password
 
@@ -2054,13 +2056,13 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
             }
 
 
-## /forgotPassword
+## /forgotFlareUserPwd
 ### Forgot Password [POST]
 
 Will email a link to the user to rest their password. User will click on that link and reset it, and then next /resetPassword ws is called.
 Important!: They want us to generate the email and the reset link inside of it goes will also be in the CMS.
 Don't think jwt token is needed here, since you want user to click Forgot Password from before signed into app (since they don't know password in first place so their jwt token is probably invalid).
-Note: should call /forgotFlareUserPwd AS service. Please look at dev-as if you can to look at sample request.
+Note: should call /forgotFlareUserPwd AS service (seems like they are just confirming this email is valid to send a reset email to. That means we need to create a system to send emails and also a webform for that email's reset link to submit below /resetPassword). Please look at dev-as if you can to look at sample request.
 
 + Request 200 (application/json)
 
@@ -2248,26 +2250,40 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 
     + Attributes
         + jwt_token (string) - test
+        + OS (string) - android or ios or (web)
         + locale (string) - test
         + fcm_token (string) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + flare_user_id (number) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
+        + preferred_screen_density - test
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + patient_profile_score_formula (string) - send up what profile score formula as maybe these were evaluated offline?
         + flare_responses (array[FlareResponse]) - test
+        + Arian: need to relook at these params to see what else need to send up. if this is an offline submission? if need to send up the 'passing logic' formula used if offline?
 
     + Body
 
 
             {
                 "jwt_token": "abc123",
-                "locale": "locale",
-                "fcm_token": "def456",
-                "patient_id": 101010101,
+
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
                 "flare_user_id": 101,
-                "device_id": "ghi789",
-                "app_last_updated_date": "2017-05-14 13:00:00",
+                "patient_id": 101010101,
+                "email": "test@hotmail.com"
                 "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
                 /* check to see if always eval the score: "patient_profile_score": 80 */,
                 "flare_responses": [ 
@@ -2344,15 +2360,26 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 
 
 + Response 200 (application/json)
+
     + Attributes
-        +TODO: add the returned things here like score!!! and status etc.
-
-
+        + request_status (RequestStatusObject)
+        + cms_data - empty
+        + acurian_services_data - just passalong data like below example
+        
     + Body
     
             {
-                "test": true
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        
+                    }
+                }
             }
+
 
 
 # Group Reporting/Spectrum Graph web services
@@ -2361,6 +2388,7 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 ### Get Flare User's Spectrum Graph [POST]
 
 Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at dev-as if you can to look at sample request.
+
 + Request (application/json)
 
     + Attributes
@@ -2386,7 +2414,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                 "fcm_token": "abc123...",
                 "app_name": "default_flare_app",
                 "app_version": "v1",
-                "cms_version": "default"
+                "cms_version": "default",
                 "device_id": "def124",
                 "app_last_updated_date": "2017-05-01 23:00:00",
                 "preferred_screen_density": "android_mdpi",
@@ -2407,6 +2435,78 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
             {
                 "test": true
             }
+
+##/getNumberPatientsSameScoreStatus
+### Get Number of patients who are in the score/color-status as the Flare User [POST]
+
+
+
++ Request (application/json)
+
+    + Attributes
+        + jwt_token (string) - test
+        + locale (string) - test
+        + fcm_token (string) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + flare_user_id (number) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + date_time (string) - expect format like '2017-07-30 23:59:59'
+        + score_number_value  (number, optional) - one of these two are required, #1 (preferably this one)
+        + score_mapping_value (string, optional) - one of these two are required, #2
+        
+
+    + Body
+
+        
+            {
+                "OS": "android",
+                "locale": "en_US", 
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "date_time": "2017-07-30 23:59:59",
+                "score_number_value": 20
+            }
+
++ Response 200 (application/json)
+    + Attributes
+        + request_status (RequestStatusObject)
+        + cms_data (object) - find the matching data in the Patient Profile Color Status mappings
+            + score_number_value (number) - if the request passes up the score #, figure out the text below
+            + score_mapping_value (string) - if the request passes up the mapped value, figure out the score above
+            + score_color (string) - hex color defined in the color status page
+            + translated_color (string) - get from their Translation Group, translate the key defined in the color status page
+        + acurian_services_data - just passalong data like below example
+
+    + Body
+    
+    
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {
+                    "score_number_value": 20,
+                    "score_mapping_value": "Red",
+                    "score_color": "#FF0000",
+                    "translated_color": "Rojo"
+                },
+                "acurian_services_data": {
+                    "example": "Dmitriy didnt define this service yet but expect data similar like so:",
+                    apiResponse: {
+                        numberOfPatientsWithSameScoreStatus: 72
+                    }
+                }
+            }
+
+
 
 # Group CMS apis for the CMS Admin GUI
 
@@ -2465,7 +2565,7 @@ find locale of the patient + find the translation group of his study which help 
         + flare_user_id (string, optional) -    one of these 3 required, #1
         + patient_id (string, optional) -       one of these 3 required, #2
         + email (string, optional) -            one of these 3 required, #3
-        + message (string,optional) -                 one of these 2 required, #1
+        + message (string,optional) -                 one of these 2 required, #1 (this can be a backup in case no translation found for key below)
         + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
         + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
         + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
@@ -2497,6 +2597,7 @@ find locale of the patient + find the translation group of his study which help 
 ### Update Profile Baseline Questions [POST]
 
 Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
+???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion
 
 + Request 200 (application/json)
 
@@ -2509,7 +2610,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
         + flare_user_id (number) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
-        + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
+        + baseline_flare_respo/updateProfileBaselineQuestionsnses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
 
 
     + Body

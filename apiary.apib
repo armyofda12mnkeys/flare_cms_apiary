@@ -1888,9 +1888,9 @@ upon registration (after validating the token which happens separately)
 ## /login
 ### Login [POST]
 
-Note: should authenticate user and issue jwt token
-Note: Get all the data as mobile-team has wiped clean!!!
-    so should call /??? AS service to get more data from AS? (prob needs to get the Survey Questions, and Patient Profile and Patient Status... )
+Note: should authenticate user (via confirming user/pass via AS) and issue jwt token
+Note: Get all the data as mobile-team has wiped clean!!! So very very similar to /register.
+Note: should call /authFlareUser AS service. Please look at dev-as if you can to look at sample request. (prob needs to get the PatientProfile, and PatientStatus, and BaselineAnswers, and SurveyQuestions)
 Note: and CMS should return the usual data all in inserts array since starting from scratch (if logout, mobile-app data is wiped out... minus device-id i think)
 
 + Request 200 (application/json)
@@ -1938,7 +1938,9 @@ Note: if jwt token is valid, return any updated data
         {
             "OS", "android",
             "locale", "en_US",
-            "fcm_token", "abc123..."
+            "fcm_token", "abc123...", 
+            "badge_group_id": 1,
+            "avatar_group_id": 2
         }
         
 + Response 200 (application/json)

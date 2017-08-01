@@ -265,6 +265,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
                 "cms_version": "default",                
                 "device_id": "abc123def456ghi7890jklmnopqrstuv",
                 "app_last_updated_date": "2017-05-01 23:00:00",
+                
                 "registration_key": "LMYLF6"
             }
 
@@ -303,10 +304,19 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
 ### Reset (and possibly Generate) Flare Patient Registration Key
 
 Note: should call /resetFlareUserRegistrationKey AS service
+Some of these params below aren't needed but for now we agreed to always accept if they are available and sent up from the mobile-app (OS till app_last_updated_date for example)
 
 + Request 200 (application/json)
 
     + Attributes
+        + OS (string) - 
+        + locale (string, optional) - 
+        + fcm_token (string) - 
+        + app_name (string) - 
+        + app_version (string) - 
+        + cms_version (string) - 
+        + device_id (string, optional) - 
+        + app_last_updated_date (string, optional) - 
         + first_name (required)
         + last_name (required)
         + dob (required)
@@ -318,6 +328,15 @@ Note: should call /resetFlareUserRegistrationKey AS service
     + Body 
 
             {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default",                
+                "device_id": "abc123def456ghi7890jklmnopqrstuv",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                
                 "first_name": "Acurian",
                 "last_name":"Trial",
                 "dob":"26-03-1973",
@@ -423,7 +442,7 @@ Note: should call /resetFlareUserRegistrationKey AS service
 ## /register
 ### Register [POST]
 
-Note: should call /registerFlareUser AS service
+Note: should call /registerFlareUser AS service and /getFlareSurveyByProjectCode/{projectCode} AS service for the 2 objects under acurian_services_data
 upon registration (after validating the token which happens separately)
 ???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
 
@@ -441,7 +460,7 @@ upon registration (after validating the token which happens separately)
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + activation_key - *** is there something else that can be used if they dont have activation key?
         + email (string, required) - *** email from 
-        + password (string, optional) - ***
+        + password (string, optional) - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
     
     + Headers
     
@@ -462,14 +481,75 @@ upon registration (after validating the token which happens separately)
                 "activation_key": "usertypingsomething",
                 "email": "test@hotmail.com",
                 "phone_number": "abc1234"
-                "password": "password@2!$test"
+                "password": "md5(password@2!$test)"
             }
     
 + Response 200 (application/json)
 
     + Attributes
         + request_status (RequestStatusObject)
-        + otherInfo - ***!!!***
+        + cms_data (object)
+            + theme_info (object) - return prelogin theme keys only! or all keys that arent images or uploads
+                + theme_id
+                + theme_name (string)
+                + is_inherited
+                + inherited_theme_id
+                + inherited_theme_name
+                + theme_values (object)
+                    + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + deletes (array[TranslationOrThemeKeyValueDeleteObject])
+            + translation_info (object)
+                + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
+                + translation_language (object)
+                    + lang_code (string)
+                    + lang_desc (string)
+                + translation_country (object)
+                    + country_code (string) - might be null if we using default en translation pretend
+                    + country_desc (string) - might be null if we using default en translation pretend
+                + translation_values (object)
+                    + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
+                    + deletes (array[TranslationOrThemeKeyValueDeleteObject])
+            + study_materials
+                + inserts (array[AppMaterialOrStudyMaterialInsertOrUpdateObject])
+                + updates (array[AppMaterialOrStudyMaterialInsertOrUpdateObject])
+                + deletes (array[AppMaterialOrStudyMaterialDeleteObject])
+            + app_materials
+                + inserts (array[AppMaterialOrStudyMaterialInsertOrUpdateObject])
+                + updates (array[AppMaterialOrStudyMaterialInsertOrUpdateObject])
+                + deletes (array[AppMaterialOrStudyMaterialDeleteObject])
+            + avatars
+                + avatar_group_id (number)
+                + avatar_group_name (string)
+                + inserts (array[AvatarInsertOrUpdateObject])
+                + updates (array[AvatarInsertOrUpdateObject])
+                + deletes (array[AvatarOrBadgeDeleteObject])
+            + badges
+                + badge_group_id (number)
+                + badge_group_name (string)
+                + inserts (array[BadgeInsertOrUpdateObject])
+                + updates (array[BadgeInsertOrUpdateObject])
+                + deletes (array[AvatarOrBadgeDeleteObject])
+            + app_info
+                + latency_minutes (number) - this can probably be moved into study_info but im not very picky on this since its a true app configuration vs study... maybe we want to add more things in the future to the app_info
+            + study_info
+                + study_id (number) - already in the 
+                + project_code (string)
+                + cms_study_id (number)
+                + avatar_trigger (string) - for now we only have 1 type of trigger, so using string for now. later we maybe have an id from the dropdown
+                + badge_trigger (string) - for now we only have 1 type of trigger, so using string for now. later we maybe have an id from the dropdown
+                + number_hours_maintain_streak_data (number)
+                + allow_interaction_with_app_if_in_flare (boolean)
+                + spectrum_graph_colors (array[SpectrumColorObject]) - hardcoded for now, we will make a CMS page later to collect this info which will build the spectrum graph dynamically
+                + patient_profile_score
+                    + patient_profile_score_formula (string)
+                    + patient_profile_score_mapping (array[PatientProfileScoreMappingObject])
+                + question_color_image_mapping
+                    + questions (array[QuestionColorImageMappingObject])
+        + acurian_services_data (object)
+            + patient_info (object) - pull this data from the AS service: POST /registerFlareUser (params: emailID, phoneNumber, password, registrationKey, languagePref ... correspond to our values: email, phone_number, password, activation_key, locale)
+            + survey_info (object)  - pull this data from the AS service: GET /getFlareSurveyByProjectCode/{projectCode} 
         
     + Body
 
@@ -1624,6 +1704,7 @@ upon registration (after validating the token which happens separately)
                                 "patientId": 60938249,
                                 "oldPatientId": null,
                                 "originalPatientId": null,
+                                "lastUpdated": "2017-07-21 02:23:08 PM EDT",
                                 "questionList": [{
                                         "questionCd": "Q0012577",
                                         "questionText": "On an average day, how many total bowel movements do you have?",
@@ -1867,61 +1948,296 @@ Note: if jwt token is valid, return any updated data
     
 # Group Password Group
 
-## /changePassword
+## /changeFlareUserPwd
 ### Change Password [POST]
 
-Note: should call /changeFlareUserPwd AS service
+User is already signed into the app, so need to pass jwt token to make sure allowed to call this WS.
+Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you can to look at sample request.
 
 + Request 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Attributes
+        + jwt_token - since user already signed into mobile app, need to check if signed in
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
+        + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + email
+        + oldPassword
+        + newPassword
+        
+    + Body
     
+            {
+                "jwt_token": "abc123",
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "activation_key": "usertypingsomething",
+                "email": "test@hotmail.com",
+                "oldPassword": "oldPass123"
+                "newPassword": "newPass123"
+            }
+            
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
 
 
-## /resetPassword
+    + Attributes
+        + request_status (RequestStatusObject)
+        + cms_data - empty
+        + acurian_services_data - just passalong data like below example
+        
+    + Body
+    
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        FlareUser: {
+                            flareUserId: 289,
+                            emailId: "armyofda12mnkeys+4@gmail.com",
+                            phoneNumber: null,
+                            password: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83DuMmoEtjhHBHbaUcRIEApr8UaKzHEVfjRSD8476+WJ33kO9oLW37OPr7PS060gjhkBZHwubOoXyWKFbrm04/vK",
+                            registrationKey: "TG4M7H",
+                            languagePref: "en_US",
+                            studyId: 7176,
+                            textPref: true,
+                            phonePref: true,
+                            emailPref: true,
+                            surveyFreq: "DAILY",
+                            notifFreq: "WEEKLY",
+                            patientId: 60938249,
+                            oldPassword: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83CZfSvz6OKrGTlcSwY/0VamkT7Fkrzs/9+M8YQ2Xrm0drN8Jc9AsXXRwdQBiwbFx2Mm0jBInnFBEHIFd7pMPKXl",
+                            newPassword: null,
+                            status: "ACTIVE",
+                            firstName: "Acurian",
+                            lastName: "Trial",
+                            projectCode: "FLAREFUL",
+                            registrationKeyExpired: true,
+                            site: null,
+                            metaData: {
+                            version: "0.0.1",
+                            date: "Mon Jul 31 13:46:35 EDT 2017"
+                            },
+                            dob: null,
+                            zipCode: null,
+                            streetAddress: null,
+                            lastLoginDate: null,
+                            lastSurveySubmissionDate: null
+                        }
+                    },
+                    apiErrors: [{
+                            code: 200,
+                            status: "CHANGED",
+                            message: "Successfully changed",
+                            moreInfo: "Successfully changed",
+                            httpStatus: "OK",
+                            versionInfo: "Supported"
+                        }
+                    ]
+                }
+            }
+
+
+## /forgotPassword
+### Forgot Password [POST]
+
+Will email a link to the user to rest their password. User will click on that link and reset it, and then next /resetPassword ws is called.
+Important!: They want us to generate the email and the reset link inside of it goes will also be in the CMS.
+Don't think jwt token is needed here, since you want user to click Forgot Password from before signed into app (since they don't know password in first place so their jwt token is probably invalid).
+Note: should call /forgotFlareUserPwd AS service. Please look at dev-as if you can to look at sample request.
+
++ Request 200 (application/json)
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
+        + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + email
+
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "email": "test@hotmail.com"
+            }
+        
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (RequestStatusObject)
+        + cms_data - empty
+        + acurian_services_data - just passalong data like below example
+        
+    + Body
+    
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        FlareUser: {
+                            flareUserId: 289,
+                            emailId: "armyofda12mnkeys+4@gmail.com",
+                            phoneNumber: null,
+                            password: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83CZfSvz6OKrGTlcSwY/0VamkT7Fkrzs/9+M8YQ2Xrm0drN8Jc9AsXXRwdQBiwbFx2Mm0jBInnFBEHIFd7pMPKXl",
+                            registrationKey: "TG4M7H",
+                            languagePref: "en_US",
+                            studyId: 7176,
+                            textPref: true,
+                            phonePref: true,
+                            emailPref: true,
+                            surveyFreq: "DAILY",
+                            notifFreq: "WEEKLY",
+                            patientId: 60938249,
+                            oldPassword: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83DuMmoEtjhHBHbaUcRIEApr8UaKzHEVfjRSD8476+WJ33kO9oLW37OPr7PS060gjhkBZHwubOoXyWKFbrm04/vK",
+                            newPassword: null,
+                            status: "ACTIVE",
+                            firstName: "Acurian",
+                            lastName: "Trial",
+                            projectCode: "FLAREFUL",
+                            registrationKeyExpired: true,
+                            site: null,
+                            metaData: {
+                                version: "0.0.1",
+                                date: "Mon Jul 31 13:49:47 EDT 2017"
+                            },
+                            dob: null,
+                            zipCode: null,
+                            streetAddress: null,
+                            lastLoginDate: null,
+                            lastSurveySubmissionDate: null
+                        }
+                    },
+                    apiErrors: [{
+                            code: 200,
+                            status: "FORGOT_PASSWORD_EMAIL_SENT",
+                            message: "Email sent successfully to reset the password",
+                            moreInfo: "Email sent successfully to reset the password",
+                            httpStatus: "OK",
+                            versionInfo: "Supported"
+                        }
+                    ]
+                }
+            }
+
+
+## /resetFlareUserPwd
 ### Reset Password [POST]
 
-Note: should call /resetFlareUserPwd AS service
+Will email a link to the user to rest their password. User will click on that link and reset it, and then THIS /resetPassword ws is called.
+Important!: they expect CMS to create this reset-link webform which submits this request too! I guess this webform should be translatable as well based on a locale param.
+Don't think jwt token is needed here, since its being called from a webpage outside of mobile-app.
+Note: should call /resetFlareUserPwd AS service. Please look at dev-as if you can to look at sample request.
+Note: ask Dmitriy if this webpage form has or needs more security (i think i saw it passes just email as its param so i can type anyone's email to reset it).
 
 + Request 200 (application/json)
-
-        {
-            "test": true
-        }
     
+    + Attributes
+        + email
+        + password
+
+    + Body 
+    
+            {
+                "email": "test@hotmail.com",
+                "password": "pass123"
+            }
+            
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Attributes
+        + request_status (RequestStatusObject)
+        + cms_data - empty
+        + acurian_services_data - just passalong data like below example
+        
+    + Body
+    
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {},
+                "acurian_services_data": {
+                    apiResponse: {
+                        FlareUser: {
+                            flareUserId: 289,
+                            emailId: "armyofda12mnkeys+4@gmail.com",
+                            phoneNumber: null,
+                            password: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83CZfSvz6OKrGTlcSwY/0VamkT7Fkrzs/9+M8YQ2Xrm0drN8Jc9AsXXRwdQBiwbFx2Mm0jBInnFBEHIFd7pMPKXl",
+                            registrationKey: "TG4M7H",
+                            languagePref: "en_US",
+                            studyId: 7176,
+                            textPref: true,
+                            phonePref: true,
+                            emailPref: true,
+                            surveyFreq: "DAILY",
+                            notifFreq: "WEEKLY",
+                            patientId: 60938249,
+                            oldPassword: "K+0K/7Y1kVu7txOgfXw7F/jXUhKLeNUrVNfTuQKB83DuMmoEtjhHBHbaUcRIEApr8UaKzHEVfjRSD8476+WJ33kO9oLW37OPr7PS060gjhkBZHwubOoXyWKFbrm04/vK",
+                            newPassword: null,
+                            status: "ACTIVE",
+                            firstName: "Acurian",
+                            lastName: "Trial",
+                            projectCode: "FLAREFUL",
+                            registrationKeyExpired: true,
+                            site: null,
+                            metaData: {
+                                version: "0.0.1",
+                                date: "Mon Jul 31 13:48:10 EDT 2017"
+                            },
+                            dob: null,
+                            zipCode: null,
+                            streetAddress: null,
+                            lastLoginDate: null,
+                            lastSurveySubmissionDate: null
+                        }
+                    },
+                    apiErrors: [{
+                            code: 200,
+                            status: "CHANGED",
+                            message: "Successfully changed",
+                            moreInfo: "Successfully changed",
+                            httpStatus: "OK",
+                            versionInfo: "Supported"
+                        }
+                    ]
+                }
+            }
 
 
 # Group Other important Group
-
-## /sendUserTracking
-### send User Tracking [POST]
-event category button-click, screen-view... need to define these
-event 1, id-of-button, name-of-screen-view
-event 2, not sure
-
-+ Request 200 (application/json)
-
-        {
-            "test": true
-        }
-    
-+ Response 200 (application/json)
-
-        {
-            "test": true
-        }
 
 
 ## /sendFlareResponse
@@ -2042,13 +2358,55 @@ event 2, not sure
 # Group Reporting/Spectrum Graph web services
 
 ##/getFlareUserSpectrumGraph
-### Get Flare User's Spectrum Graph
+### Get Flare User's Spectrum Graph [POST]
 
-##/getFlareUserAnswers
-### Get Flare User's Answers
+Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at dev-as if you can to look at sample request.
++ Request (application/json)
+
+    + Attributes
+        + jwt_token (string) - test
+        + locale (string) - test
+        + fcm_token (string) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + flare_user_id (number) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + number_of_records (number) -
+        + end_date (string) - note: AS expects this format: '6/27/2017', please convert from our normal format: '2017-06-27'
+        
+
+    + Body
+
+        
+            {
+                "OS": "android",
+                "locale": "en_US", 
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "email": "test@hotmail.com",
+                "number_of_records": 7,
+                "endDate": "2017-06-27"
+            }
 
 
 
++ Response 200 (application/json)
+    + Attributes
+        +TODO: add the returned things here like score!!! and status etc.
+
+
+    + Body
+    
+            {
+                "test": true
+            }
 
 # Group CMS apis for the CMS Admin GUI
 
@@ -2190,11 +2548,14 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
                 "extra_info": "Baseline question(s) updated"
             }
     
+# Group Low Priority, probably not needed:
 
-# Group TEST GROUP
 
-## /test1
-### Test1 [POST]
+## /sendUserTracking
+### send User Tracking [POST]
+event category button-click, screen-view... need to define these
+event 1, id-of-button, name-of-screen-view
+event 2, not sure
 
 + Request 200 (application/json)
 
@@ -2234,12 +2595,87 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 + type (string)
 + os (string)
 + pre_login (string)
-+ inserted_date (string, optional) - well one of these dates are required
-+ updated_date (string, optional)  - well one of these dates are required
++ inserted_date (string, optional) - well one of these 2 dates are required, #1
++ updated_date (string, optional)  - well one of these 2 dates are required, #2
 
 ## TranslationOrThemeKeyValueDeleteObject
 + key (string)
 + deleted_date (string)
+
+## AppMaterialOrStudyMaterialInsertOrUpdateObject 
++ app_material_id (number, optional)   - one of these 2 are required, #1
++ study_material_id (number, optional) - one of these 2 are required, #2
++ title - general title/description of file
++ type - internal_cms_file_resource or external_url_resource
++ file_url (string) - url to internal or external cms link
++ pre_download_resource (boolean) - true or false for mobile app to pre-download it
++ section_category (string) - which category to place the resource in
+
+## AppMaterialOrStudyMaterialDeleteObject
++ study_material_id (string)
++ deleted_date (string)
+
+## AvatarInsertOrUpdateObject
++ avatar_id (number)
++ avatar_name (string)
++ order (number)
++ pieces (array[AvatarPieceObject])
+
+## AvatarPieceObject
++ piece_name
++ true_index
++ index
++ file_urls (array[AvatarOrBadgePieceFileUrlObject])
+
+## AvatarOrBadgeDeleteObject
++ badge_id (number, optional)  - one of these 2 are required, #1
++ avatar_id (number, optional) - one of these 2 are required, #2
++ deleted_date (string)
+
+## BadgeInsertOrUpdateObject
++ badge_id (number)
++ badge_name (string)
++ streak_days_to_win (number)
++ file_urls (array[AvatarOrBadgePieceFileUrlObject])
+
+
+## AvatarOrBadgePieceFileUrlObject
++ avatar_image_id (number, optional) - one of these 2 are required, #1
++ badge_image_id (number, optional)  - one of these 2 are required, #2
++ screen_density
++ file_url
+
+
+
+## SpectrumColorObject
++ index (number) - implies an order to the mobile app
++ color (string) - hex value like '#FF0000'
++ color_name (string) - name/desc of the color
+
+
+
+## PatientProfileScoreMappingObject
++ score (number)
++ desc (string)
++ color (string)
++ translation_key (string) - this will be a lookup to a translation color. like above color maybe 'Green' but we may have to return '
+
+## QuestionColorImageMappingObject
++ question_code (string)
++ question_color_image_logic (array[QuestionColorImageLogicObject])
+
+## QuestionColorImageLogicObject
++ question_color_image_logic_id (number)
++ javascript_formula (string)
++ background_color (object)
+    + gradient_color_top (optional)    - either this set of 3 gradients or the 1 solid color are required, #1a
+    + gradient_color_middle (optional) - either this set of 3 gradients or the 1 solid color are required, #1b
+    + gradient_color_bottom (optional) - either this set of 3 gradients or the 1 solid color are required, #1c
+    + solid_color (optional)           - either this set of 3 gradients or the 1 solid color are required, #2
+    + text_color
++ file_urls (object)
+    + screen_density
+    + file_url
 
 
 ##RequestStatusObject

@@ -2006,11 +2006,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to the patient_id from AS, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to the flare_user_id from AS value )
-
-
-
-
-
+            + patient_flare_status (object) - ???Question for Dmitriy??? i have an email to Dmitry, Kalyana is CCed too, asking if this 'flare status' is returned in the patient_info obj above or need to pull via another AS WS (if so return that object here).
 
 
 
@@ -2040,8 +2036,8 @@ Note: I asked the mobile team to send up the badge_group_id and avatar_group_id 
         + translation_group_id - in case translation-group totally changed for user, pass back everything for new translation-group in inserts array otherwise do normal inserts/updates/deletes check within the translation-group
         + avatar_group_id      - in case avatar-group totally changed for user,      pass back everything for new avatar-group in inserts array otherwise do normal inserts/updates/deletes check within the avatar-group
         + badge_group_id       - in case badge-group totally changed for user,       pass back everything for new badge-group in inserts array otherwise do normal inserts/updates/deletes check within the badge-group
-        
-    
+
+
     + Body
     
             {
@@ -2070,7 +2066,7 @@ Note: I asked the mobile team to send up the badge_group_id and avatar_group_id 
     
 # Group Password Group
 
-## /changeFlareUserPwd
+## /changePassword
 ### Change Password [POST]
 
 User is already signed into the app, so need to pass jwt token to make sure allowed to call this WS.
@@ -2176,7 +2172,7 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
             }
 
 
-## /forgotFlareUserPwd
+## /forgotPassword
 ### Forgot Password [POST]
 
 Will email a link to the user to rest their password. User will click on that link and reset it, and then next /resetPassword ws is called.
@@ -2275,7 +2271,7 @@ Note: should call /forgotFlareUserPwd AS service (seems like they are just confi
             }
 
 
-## /resetFlareUserPwd
+## /resetPassword
 ### Reset Password [POST]
 
 Will email a link to the user to rest their password. User will click on that link and reset it, and then THIS /resetPassword ws is called.

@@ -76,6 +76,7 @@ function register_v2(){ //in future this may exist
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
+            + cms_app_last_updated_date (string)
             + device_id (string)
             + theme_info (object) - return prelogin theme keys only!
                 + theme_id
@@ -109,6 +110,7 @@ function register_v2(){ //in future this may exist
                 "status": "success"
               },
               "cms_data": {
+                "cms_app_last_updated_date": "2017-01-10 23:45:12",
                 "device_id": "abc123def456ghi7890jklmnopqrstuv",
                 "theme_info":
                   {
@@ -497,6 +499,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
+            + cms_app_last_updated_date (string) -
             + jwt_token (string) - hmmm so if we can't call our own /login since it will return data as if you logged in for 1st time, then we have to call AS's login directly and get the jwt token here (also will issue one if user logs out and has to do a CMS /login)
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
@@ -569,6 +572,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     "status": "success"
                 },
                 "cms_data": {
+                    "cms_app_last_updated_date": "2017-01-10 23:45:12",
                     "jwt_token": "def456...",
                     "theme_info": {
                         "theme_id": 2,
@@ -1948,6 +1952,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
    + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
+            + cms_app_last_updated_date (string) -
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
@@ -2074,6 +2079,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
    + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
+            + cms_app_last_updated_date (string) - 
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
@@ -2138,7 +2144,8 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to our flare_user_id value )
             + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value ). Looks like have to loop through that array to get the current status by getting the status which has currentChoice: "Y"
 
-        
+    
+
     
 # Group Password Group
 

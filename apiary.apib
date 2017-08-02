@@ -450,6 +450,8 @@ Note: should call /registerFlareUser AS service and /getFlareSurveyByProjectCode
 Note: similar to how we filtered theme/translation keys for pre-login keys for /appLaunch, make sure to filter theme/translation keys for post-login keys for /register
 upon registration (after validating the token which happens separately)
 ???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
+Note: subscribe to FCM topics here as needed.
+Note: create a good patient schema here since we'll have the flare_user_id and things to related to it like device_id, fcm_token, etc.
 
 + Request 200 (application/json)
 
@@ -566,6 +568,7 @@ upon registration (after validating the token which happens separately)
                     "status": "success"
                 },
                 "cms_data": {
+                    "jwt_token": "def456...",
                     "theme_info": {
                         "theme_id": 2,
                         "theme_name": "Theme AAA",
@@ -1895,7 +1898,7 @@ upon registration (after validating the token which happens separately)
 
 ## /login
 ### Login [POST]
-{proj
+
 Note: should authenticate user (via confirming user/pass via AS /authFlareUser) and issue jwt token
 Note: Get all the data as mobile-team has wiped the device clean!!! So very very similar to /register.
 Note: should call /authFlareUser AS service. Please look at dev-as if you can to look at sample request. 
@@ -2085,6 +2088,9 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
         + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
         + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
         + email
         + oldPassword
         + newPassword
@@ -2103,6 +2109,9 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
                 "app_last_updated_date": "2017-05-01 23:00:00",
                 "preferred_screen_density": "android_mdpi",
                 "activation_key": "usertypingsomething",
+                "email": "test@hotmail.com",
+                "email": "test@hotmail.com",
+                "email": "test@hotmail.com",
                 "email": "test@hotmail.com",
                 "oldPassword": "oldPass123"
                 "newPassword": "newPass123"
@@ -2586,6 +2595,9 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                 "cms_version": "default"
                 "device_id": "def124",
                 "app_last_updated_date": "2017-05-01 23:00:00",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com"
                 "preferred_screen_density": "android_mdpi",
                 "date_time": "2017-07-30 23:59:59",
                 "score_number_value": 20
@@ -2615,7 +2627,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                     "translated_color": "Rojo"
                 },
                 "acurian_services_data": {
-                    "example": "Dmitriy didnt define this service yet but expect data similar like so:",
+                    "example": "???Question???: Dmitriy didnt define this service yet. please check in with him. but expect data similar like so:",
                     apiResponse: {
                         numberOfPatientsWithSameScoreStatus: 72
                     }
@@ -2713,32 +2725,37 @@ find locale of the patient + find the translation group of his study which help 
 ### Update Profile Baseline Questions [POST]
 
 Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
-???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion
+???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion (look at dev-as, seems like passes an array of values)
 
 + Request 200 (application/json)
 
     + Attributes
         + jwt_token (string) - test
+        + OS (string) - android or ios or (web)
         + locale (string) - test
         + fcm_token (string) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + flare_user_id (number) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
-        + baseline_flare_respo/updateProfileBaselineQuestionsnses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
+        + preferred_screen_density - test
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
 
 
     + Body
 
             {
                 "jwt_token": "abc123",
+                "OS": "android"
                 "locale": "locale",
                 "fcm_token": "def456",
-                "patient_id": 101010101,
-                "flare_user_id": 101,
                 "device_id": "ghi789",
                 "app_last_updated_date": "2017-05-14 13:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com"
                 "baseline_flare_responses": [ 
                     {
                       "submission_order": 1,

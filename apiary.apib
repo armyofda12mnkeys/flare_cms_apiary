@@ -446,7 +446,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
 ## /register
 ### Register [POST]
 
-Note: should call /registerFlareUser AS service and /getFlareSurveyByProjectCode/{projectCode} AS service for the 2 objects under acurian_services_data
+Note: should call /registerFlareUser AS service and /getFlareSurvey AS service for the 2 objects under acurian_services_data
 Note: similar to how we filtered theme/translation keys for pre-login keys for /appLaunch, make sure to filter theme/translation keys for post-login keys for /register
 upon registration (after validating the token which happens separately)
 ???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
@@ -2133,9 +2133,9 @@ A little iffy on the acurian_services_data, for now copied from /login.
                     + questions (array[QuestionColorImageMappingObject])
         + acurian_services_data (object)
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
-            + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to the patient_id from AS, and locale values)
-            + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to the flare_user_id from AS value )
-            + patient_flare_status (object) - ???Question for Dmitriy??? i have an email to Dmitry, Kalyana is CCed too, asking if this 'flare status' is returned in the patient_info obj above or need to pull via another AS WS (if so return that object here).
+            + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to our patient_id, and locale values)
+            + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to our flare_user_id value )
+            + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value )
 
         
     

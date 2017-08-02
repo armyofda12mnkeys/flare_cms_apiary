@@ -21,9 +21,10 @@ Note: based on the app and version, we can figure out the prelogin Translation k
 Note: on the 1st launch they won't send up device id, but subsequent launch will (hence how you will know if need to create a device-id or not). 
 Note: check to see if the FCM token has changed for this device-id
 
-???Question???: Should this WS have authentication like Basic since it doesnt have JWT Auth? (should the other ws requests which do have JWT Auth also have Basic Auth?)
-???Question???: Which FCM Topic registrations should happen here? (os, locale, app, version)
-Please call cms_version of apis. for example if default is not sent up, try to match up to a version. For now maybe we can always assume default() method?
+Question: Should this WS have authentication like Basic since it doesnt have JWT Auth? (should the other ws requests which do have JWT Auth also have Basic Auth?). Answer: Sampad said that all W.S. should have Basic for ws auth, and we can use the JWT for user auth on WS that need them
+Question: Which FCM Topic registrations should happen here? (Answer: os, locale, app, version). I am fine moving these generic ones (along with the patient/study-specific topics) into /register if you want to do them in 1 place.
+
+Please call cms_version of apis for all web services. for example if default is not sent up, try to match up to a version. For now maybe we can always assume default() method?
 function register($cms_version){
     if($cms_version=='default' || isDefault($cms_version) ) { register_default(); }
     else if($cms_version!='default' || versionMatchInDB($cms_version) && functionExists('register_'. $cms_version) ) { register$cms_version(); } 
@@ -449,7 +450,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
 Note: should call /registerFlareUser AS service and /getFlareSurvey AS service for the 2 objects under acurian_services_data
 Note: similar to how we filtered theme/translation keys for pre-login keys for /appLaunch, make sure to filter theme/translation keys for post-login keys for /register
 upon registration (after validating the token which happens separately)
-???Question???: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?
+Question: should we issue a jwt token to auto-login you in here, or call /login or /authorization after?: Answer: we should issue a jwt token and call AS /authorize with the same user/password so they can see that someone 'logged in' (their AS register doesn't do this)
 Note: subscribe to FCM topics here as needed.
 Note: create a good patient schema here since we'll have the flare_user_id and things to related to it like device_id, fcm_token, etc.
 
@@ -2009,7 +2010,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to the patient_id from AS, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to the flare_user_id from AS value )
-            + patient_flare_status (object) - ???Question for Dmitriy??? i have an email to Dmitry, Kalyana is CCed too, asking if this 'flare status' is returned in the patient_info obj above or need to pull via another AS WS (if so return that object here).
+            + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value ). Looks like have to loop through that array to get the current status by getting the status which has currentChoice: "Y"
 
 
 

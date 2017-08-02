@@ -2091,9 +2091,8 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
         + flare_user_id (number) - test
         + patient_id (number) - test
         + email (string) - test
-        + email
-        + oldPassword
-        + newPassword
+        + oldPassword (string)
+        + newPassword (string)
         
     + Body
     
@@ -2199,8 +2198,8 @@ Note: should call /forgotFlareUserPwd AS service (seems like they are just confi
         + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
         + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
         + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
-        + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
-        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + app_last_updated_date (string, optional) - eh dont think this really needed here
+        + preferred_screen_density - eh dont think this really needed here
         + email
 
     + Body
@@ -2518,14 +2517,18 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
 
     + Attributes
         + jwt_token (string) - test
+        + OS (string) - android or ios or (web)
         + locale (string) - test
         + fcm_token (string) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + flare_user_id (number) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
         + number_of_records (number) -
         + end_date (string) - note: AS expects this format: '6/27/2017', please convert from our normal format: '2017-06-27'
         
@@ -2534,6 +2537,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
 
         
             {
+                "jwt_token": "abc123...",
                 "OS": "android",
                 "locale": "en_US", 
                 "fcm_token": "abc123...",
@@ -2543,6 +2547,8 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                 "device_id": "def124",
                 "app_last_updated_date": "2017-05-01 23:00:00",
                 "preferred_screen_density": "android_mdpi",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
                 "email": "test@hotmail.com",
                 "number_of_records": 7,
                 "endDate": "2017-06-27"
@@ -2587,6 +2593,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
 
         
             {
+                "jwt_token": "abc123...",
                 "OS": "android",
                 "locale": "en_US", 
                 "fcm_token": "abc123...",
@@ -2594,10 +2601,10 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                 "app_version": "v1",
                 "cms_version": "default"
                 "device_id": "def124",
-                "app_last_updated_date": "2017-05-01 23:00:00",
                 "flare_user_id": 101,
                 "patient_id": 101010101,
                 "email": "test@acurian.com"
+                "app_last_updated_date": "2017-05-01 23:00:00",
                 "preferred_screen_density": "android_mdpi",
                 "date_time": "2017-07-30 23:59:59",
                 "score_number_value": 20
@@ -2734,6 +2741,9 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
         + OS (string) - android or ios or (web)
         + locale (string) - test
         + fcm_token (string) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
         + preferred_screen_density - test
@@ -2746,10 +2756,13 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
     + Body
 
             {
-                "jwt_token": "abc123",
+                "jwt_token": "abc123...",
                 "OS": "android"
                 "locale": "locale",
                 "fcm_token": "def456",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
                 "device_id": "ghi789",
                 "app_last_updated_date": "2017-05-14 13:00:00",
                 "preferred_screen_density": "android_mdpi",

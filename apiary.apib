@@ -2128,6 +2128,21 @@ A little iffy on the acurian_services_data, for now copied from /login.
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
+            + user_reward_status
+                + badge_status
+                    + last_badge_won (RewardBadgeObject)
+                    + gained_badges (array[RewardBadgeObject])
+                    + next_badge_to_win (RewardBadgeObject)
+                + avatar_status
+                    + last_avatar_won (object)
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_won (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[GainedAvatarObject])
+                    + next_avatar_piece_to_win (object)
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_to_win (RewardAvatarPieceObject)
             + app_info
                 + latency_minutes (number) - this can probably be moved into study_info but im not very picky on this since its a true app configuration vs study... maybe we want to add more things in the future to the app_info
             + study_info

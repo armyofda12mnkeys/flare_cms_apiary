@@ -1245,47 +1245,38 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                         "index": 1.5,
                                         "file_urls": [{
                                                 "avatar_image_id":28,
-                                                "avatar_image_id": 1,
                                                 "screen_density": "android_mdpi",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_mdpi.png"
                                             }, {
                                                 "avatar_image_id":29,
-                                                "avatar_image_id": 2,
                                                 "screen_density": "android_hdpi",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_hdpi.png"
                                             }, {
                                                 "avatar_image_id":30,
-                                                "avatar_image_id": 3,
                                                 "screen_density": "android_xhdpi",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xhdpi.png"
                                             }, {
                                                 "avatar_image_id":31,
-                                                "avatar_image_id": 4,
                                                 "screen_density": "android_xxhdpi",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xxhdpi.png"
                                             }, {
                                                 "avatar_image_id":32,
-                                                "avatar_image_id": 5,
                                                 "screen_density": "android_xxxhdpi",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__android_xxxhdpi.png"
                                             }, {
                                                 "avatar_image_id":33,
-                                                "avatar_image_id": 6,
                                                 "screen_density": "ios_1x",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_1x.png"
                                             }, {
                                                 "avatar_image_id":34,
-                                                "avatar_image_id": 7,
                                                 "screen_density": "ios_2x",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_2x.png"
                                             }, {
                                                 "avatar_image_id":35,
-                                                "avatar_image_id": 8,
                                                 "screen_density": "ios_3x",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__ios_3x.png"
                                             }, {
                                                 "avatar_image_id":36,
-                                                "avatar_image_id": 9,
                                                 "screen_density": "original",
                                                 "file_url": "http://cms.com/avatar-group-1/avatar-1/o__1--ti__4--i__1.5--n__Bird--d__piece_2--r__original.png"
                                             }
@@ -1995,6 +1986,21 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
+            + user_reward_status
+                + badge_status
+                    + last_badge_won (RewardBadgeObject)
+                    + gained_badges (array[RewardBadgeObject])
+                    + next_badge_to_win (RewardBadgeObject)
+                + avatar_status
+                    + last_avatar_won (object)
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_won (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[GainedAvatarObject])
+                    + next_avatar_piece_to_win (object)
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_to_win (RewardAvatarPieceObject)
             + app_info
                 + latency_minutes (number) - this can probably be moved into study_info but im not very picky on this since its a true app configuration vs study... maybe we want to add more things in the future to the app_info
             + study_info
@@ -2973,13 +2979,26 @@ event 2, not sure
 + file_url
 
 
+## RewardBadgeObject
++ badge_id (number)
++ badge_name (string)
++ streak_days_to_win (number)
+
+
+## GainedAvatarObject
++ avatar_id  (number)
++ avatar_name (string)
++ pieces_won (array[RewardAvatarPieceObject])
+
+## RewardAvatarPieceObject
++ piece_name
++ piece_index
++ piece_true_index
 
 ## SpectrumColorObject
 + index (number) - implies an order to the mobile app
 + color (string) - hex value like '#FF0000'
 + color_name (string) - name/desc of the color
-
-
 
 ## PatientProfileScoreMappingObject
 + score (number)
@@ -3005,12 +3024,12 @@ event 2, not sure
     + file_url
 
 
-##RequestStatusObject
+## RequestStatusObject
 + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
 + extra_info (optional) - eh , may helpful extra info even on success like "Push Notificatioon sent to fcm token $token"
 + errors (array[ErrorObject], optional) - array of errors
 
-##ErrorObject
+## ErrorObject
 + error_source (string) - "cms_error" or "acurian_services_error"
 + error_code (string) - MobileApp team will check the translations for the code/key
 + error_message (string) - "non localised error message" ... in case no translation provided, default error

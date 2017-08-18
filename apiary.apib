@@ -3098,6 +3098,33 @@ find locale of the patient + find the translation group of his study which help 
                 "extra_info": "Push notification sent to fcm token $token"
             }
     
+##/sendPushNotificationBatch
+### Send Push Notifications to list of patients [POST]
+
+optional if we have time
+
+
++ Request 200 (application/json)
+
+    + Attributes
+        + flare_user_ids (string, optional)
+        + message (string,optional) -                 one of these 2 required, #1 (this can be a backup in case no translation found for key below)
+        + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
+        + message_translation_group - instead of trying to figure out for each patient the heirarchical translation group, force one for the message_translation_key lookup
+        + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
+        + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
+        + theme_key_resolution (string, optional) -         if possible force the resolution of image to send. Not sure if this is needed, maybe we default to 'ldpi' for all ios/android?
+
+    + Body
+
+            {
+                "flare_user_ids": [101,102,104,107,110],
+                "message_translation_group": "Push Notifications",
+                "message_translation_key": "welcome_msg_to_app",
+                "message": "Welcome to this app!... This is the default text in case above key is not found",
+                "priority": "normal"
+            }
+
 
 ##/updateProfileBaselineQuestions
 ### Update Profile Baseline Questions [POST]

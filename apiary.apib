@@ -2496,8 +2496,8 @@ note: will call AS WS /setFlareSurveyResponses
         + patient_id (number) - test
         + email (string) - test
         + patient_profile_score_formula (string) - send up what profile score formula as maybe these were evaluated offline?
-        + flare_responses (array[FlareResponse]) - test
-        + Arian: need to relook at these params to see what else need to send up. if this is an offline submission? if need to send up the 'passing logic' formula used if offline?
+        + current_stored_flare_logic (array[CurrentStoredFlareLogicObj])
+        + flare_responses (array[FlareResponse]) -
 
     + Body
 
@@ -2519,10 +2519,21 @@ note: will call AS WS /setFlareSurveyResponses
                 "email": "test@hotmail.com"
                 "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
                 /* check to see if always eval the score: "patient_profile_score": 80 */,
+                "current_stored_flare_logic": [ //Elan will use this to see if stored offline logic is not trustable (if screener logic has changed)
+                    {
+                        "logic_order_num": 1,
+                        "comparison_text": "QS1<2"
+                    },
+                    {
+                        "logic_order_num": 2,
+                        "comparison_text": "QS1>2"
+                    },
+                ]
                 "flare_responses": [ 
                     {
                       "submission_order": 1,
                       "submission_date": "2017-05-21 13:00:00",
+                      //"evaluated_offline": true,
                       "answers": [
                         {
                           question_cd: "QS1",
@@ -2596,8 +2607,23 @@ note: will call AS WS /setFlareSurveyResponses
 
     + Attributes
         + request_status (RequestStatusObject)
-        + cms_data - empty
-        + acurian_services_data - just passalong data like below example
+        + cms_data - 
+            + user_reward_status
+                + badge_status
+                    + last_badge_won (RewardBadgeObject) - not sure this is needed for /sendFlareResponse
+                    + gained_badges (array[RewardBadgeObject])
+                    + next_badge_to_win (RewardBadgeObject) - not sure this is needed for /sendFlareResponse
+                + avatar_status
+                    + last_avatar_won (object) - not sure this is needed for /sendFlareResponse
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_won (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[GainedAvatarObject])
+                    + next_avatar_piece_to_win (object) - not sure this is needed for /sendFlareResponse
+                        + avatar_id  (number)
+                        + avatar_name (string)
+                        + piece_to_win (RewardAvatarPieceObject)
+        + acurian_services_data - just passalong data, will have basically flare_status, flare_score, flare_score_alt_value for each response
         
     + Body
     
@@ -2608,6 +2634,25 @@ note: will call AS WS /setFlareSurveyResponses
                 "cms_data": {},
                 "acurian_services_data": {
                     apiResponse: {
+                        
+                        "flare_responses_results": [
+                            {
+                                //just based on order? or want submission_order?
+                                flare_status: "NOT_INFLARE",
+                                flare_score: 80,
+                                flare_score_alt_value: "ORANGE"
+                            },
+                            {
+                                flare_status: "NOT_INFLARE",
+                                flare_score: 60,
+                                flare_score_alt_value: "ORANGE"
+                            },
+                            {
+                                flare_status: "IN_FLARE",
+                                flare_score: -1,
+                                flare_score_alt_value: null
+                            }
+                        ]
                         
                     }
                 }
@@ -3094,7 +3139,7 @@ find locale of the patient + find the translation group of his study which help 
     + Body
 
             {
-                "status": "success"
+                "status": "success",
                 "extra_info": "Push notification sent to fcm token $token"
             }
     
@@ -3125,6 +3170,17 @@ optional if we have time
                 "priority": "normal"
             }
 
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (RequestStatusObject)
+
+    + Body
+
+            {
+                "status": "success",
+                "extra_info": "Push notifications sent to batch"
+            }
 
 ##/updateProfileBaselineQuestions
 ### Update Profile Baseline Questions [POST]
@@ -3300,7 +3356,7 @@ event 2, not sure
 ## GainedAvatarObject
 + avatar_id  (number)
 + avatar_name (string)
-+ pieces_won (array[RewardAvatarPieceObject])
++ pieces (array[RewardAvatarPieceObject]) - changed from pieces_won
 
 ## RewardAvatarPieceObject
 + piece_name
@@ -3335,6 +3391,9 @@ event 2, not sure
     + screen_density
     + file_url
 
+## CurrentStoredFlareLogicObj
++ logic_order_num (number)
++ comparison_text (string)
 
 ## RequestStatusObject
 + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props

@@ -2526,14 +2526,14 @@ note: will call AS WS /setFlareSurveyResponses
                     },
                     {
                         "logic_order_num": 2,
-                        "comparison_text": "QS1>2"
+                        "comparison_text": "QS1>5"
                     },
-                ]
+                ],
                 "flare_responses": [ 
                     {
                       "submission_order": 1,
                       "submission_date": "2017-05-21 13:00:00",
-                      //"evaluated_offline": true,
+                      "evaluated_offline": true,
                       "answers": [
                         {
                           question_cd: "QS1",
@@ -2568,6 +2568,7 @@ note: will call AS WS /setFlareSurveyResponses
                     {
                       "submission_order": 2,
                       "submission_date": "2017-05-22 13:00:00",
+                      "evaluated_offline": false,
                       "answers": [
                         {
                           question_cd: "QS1",
@@ -2723,7 +2724,8 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                     + patient_profile_score_formula (string)
                     + patient_profile_score_mapping (array[PatientProfileScoreMappingObject])
         + acurian_services_data (object) - just passalong data like below example
-
+        TODO research adding badges and avatars here on a per 'ultimate day' basis
+        
     + Body
     
             {

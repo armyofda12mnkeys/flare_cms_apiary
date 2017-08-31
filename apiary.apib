@@ -2529,11 +2529,11 @@ note: will call AS WS /setFlareSurveyResponses
                         "comparison_text": "QS1>5"
                     },
                 ],
+                "evaluated_offline": true,
                 "flare_responses": [ 
                     {
                       "submission_order": 1,
                       "submission_date": "2017-05-21 13:00:00",
-                      "evaluated_offline": true,
                       "answers": [
                         {
                           question_cd: "QS1",
@@ -2568,7 +2568,6 @@ note: will call AS WS /setFlareSurveyResponses
                     {
                       "submission_order": 2,
                       "submission_date": "2017-05-22 13:00:00",
-                      "evaluated_offline": false,
                       "answers": [
                         {
                           question_cd: "QS1",
@@ -3110,6 +3109,7 @@ This is for CMS's 'Import Question' area. Already done, so url path may be diffe
 ### Send Push Notifications [POST]
 
 find locale of the patient + find the translation group of his study which help figure out which message to serve him.
+Note: external_app_name should be passed via a HEADER so that CMS can figure out which Basic Auth to use for it.
 
 + Request 200 (application/json)
 
@@ -3119,6 +3119,7 @@ find locale of the patient + find the translation group of his study which help 
         + email (string, optional) -            one of these 3 required, #3
         + message (string,optional) -                 one of these 2 required, #1 (this can be a backup in case no translation found for key below)
         + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
+        + message_translation_group_id (number,optional) - if above is sent, need a translation group to use
         + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
         + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
         + theme_key_resolution (string, optional) -         if possible force the resolution of image to send. Not sure if this is needed, maybe we default to 'ldpi' for all ios/android?
@@ -3127,6 +3128,7 @@ find locale of the patient + find the translation group of his study which help 
 
             {
                 "flare_user_id": 101,
+                "message_translation_group_id": 2,
                 "message_translation_key": "welcome_msg_to_app",
                 "message": "Welcome to this app!... This is the default text in case above key is not found",
                 "priority": "normal"

@@ -2517,8 +2517,15 @@ note: will call AS WS /setFlareSurveyResponses
                 "flare_user_id": 101,
                 "patient_id": 101010101,
                 "email": "test@hotmail.com"
-                "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
-                /* check to see if always eval the score: "patient_profile_score": 80 */,
+                "patient_profile_score": {
+                    "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
+                    "patient_profile_score_mapping": [
+                        {"score": 20, "desc": "orange", "color": "#FFA500", "translation_key": "spectrum_color_1"},
+                        {"score": 40, "desc": "yellow", "color": "#FFFF00", "translation_key": "spectrum_color_2"},
+                        {"score": 60, "desc": "green", "color": "#00FF00", "translation_key": "spectrum_color_3"},
+                        {"score": 80, "desc": "blue", "color": "#0000FF", "translation_key": "spectrum_color_4"},
+                    ],
+                },
                 "current_stored_flare_logic": [ //Elan will use this to see if stored offline logic is not trustable (if screener logic has changed)
                     {
                         "logic_order_num": 1,

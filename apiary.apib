@@ -259,6 +259,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
         + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
         + device_id (string, optional) - provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
         + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + registration_key - *** is there something else that can be used if they dont have activation key?
         
     + Headers
@@ -2517,15 +2518,7 @@ note: will call AS WS /setFlareSurveyResponses
                 "flare_user_id": 101,
                 "patient_id": 101010101,
                 "email": "test@hotmail.com"
-                "patient_profile_score": {
-                    "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
-                    "patient_profile_score_mapping": [
-                        {"score": 20, "desc": "orange", "color": "#FFA500", "translation_key": "spectrum_color_1"},
-                        {"score": 40, "desc": "yellow", "color": "#FFFF00", "translation_key": "spectrum_color_2"},
-                        {"score": 60, "desc": "green", "color": "#00FF00", "translation_key": "spectrum_color_3"},
-                        {"score": 80, "desc": "blue", "color": "#0000FF", "translation_key": "spectrum_color_4"},
-                    ],
-                },
+                "patient_profile_score_formula": "((((QS1+QS2+QS3)<=3) && (IN_FLARE == false)) ? 20 :(((QS1+QS2+QS3)>=4) && ((QS1+QS2+QS3)<6) &&(IN_FLARE == false)) ? 40 :(((QS1+QS2+QS3)>=6) && ((QS1+QS2+QS3)<8) &&(IN_FLARE == false)) ? 60 :(((QS1+QS2+QS3)>=8) && (IN_FLARE == false)) ? 80 : false)",
                 "current_stored_flare_logic": [ //Elan will use this to see if stored offline logic is not trustable (if screener logic has changed)
                     {
                         "logic_order_num": 1,

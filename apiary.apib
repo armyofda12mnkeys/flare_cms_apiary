@@ -2551,14 +2551,14 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS3",
-                          question_type: "checkbox",
+                          question_type: "CHKBOX",
                           view_type: "default",
                           answer_value: null,
                           answer_value_list: ["A", "4", "B", "5"]
                         },
                         {
                           question_cd: "QS4",
-                          question_type: "number",
+                          question_type: "IRADIO",
                           view_type: "default",
                           answer_value: 200,
                           answer_value_list: null
@@ -2631,7 +2631,9 @@ note: will call AS WS /setFlareSurveyResponses
                 "request_status": {
                     "status": "success"
                 },
-                "cms_data": {},
+                "cms_data": {
+                    "user_reward_status": --from my email
+                },
                 "acurian_services_data": {
                     apiResponse: {
                         

@@ -2537,6 +2537,7 @@ note: will call AS WS /setFlareSurveyResponses
                       "answers": [
                         {
                           question_cd: "QS1",
+                          question_group_code: "STUDYQUES",
                           question_type: "radio",
                           view_type: "view1",
                           answer_value: "4",
@@ -2544,6 +2545,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS2",
+                          question_group_code: "STUDYQUES",
                           question_type: "radio",
                           view_type: "default",
                           answer_value: "B",
@@ -2551,6 +2553,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS3",
+                          question_group_code: "STUDYQUES",
                           question_type: "CHKBOX",
                           view_type: "default",
                           answer_value: null,
@@ -2558,6 +2561,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS4",
+                          question_group_code: "STUDYQUES",
                           question_type: "IRADIO",
                           view_type: "default",
                           answer_value: 200,
@@ -2571,6 +2575,7 @@ note: will call AS WS /setFlareSurveyResponses
                       "answers": [
                         {
                           question_cd: "QS1",
+                          question_group_code: "STUDYQUES",
                           question_type: "radio",
                           view_type: "view1",
                           answer_value: 5,
@@ -2578,6 +2583,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS2",
+                          question_group_code: "STUDYQUES",
                           question_type: "radio",
                           view_type: "default",
                           answer_value: "C",
@@ -2585,6 +2591,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS3",
+                          question_group_code: "STUDYQUES",
                           question_type: "checkbox",
                           view_type: "default",
                           answer_value: null,
@@ -2592,6 +2599,7 @@ note: will call AS WS /setFlareSurveyResponses
                         },
                         {
                           question_cd: "QS4",
+                          question_group_code: "STUDYQUES",
                           question_type: "number",
                           view_type: "default",
                           answer_value: 333,
@@ -3106,7 +3114,24 @@ This is for CMS's 'Import Question' area. Already done, so url path may be diffe
 
 
 # Group Other Web Services
+##/unflarePatient
+    + Attributes
+        + flare_user_id (string, optional) -    one of these 3 required, #1
+        + patient_id (string, optional) -       one of these 3 required, #2
+        + email (string, optional) -            one of these 3 required, #3
+        + unflare_date_time (string) -  date time the user got unflared, please use 'YYYY-MM-DD HH:MM:SS' format unless you have your own standardized format
 
+    + Body
+
+            {
+                "flare_user_id": 101,
+                "message_translation_group_id": 2,
+                "message_translation_key": "welcome_msg_to_app",
+                "message": "Welcome to this app!... This is the default text in case above key is not found",
+                "unflare_date_time": "2017-01-31 13:30:00"
+            }
+
+        
 ##/sendPushNotification
 ### Send Push Notifications [POST]
 
@@ -3152,7 +3177,7 @@ Note: external_app_name should be passed via a HEADER so that CMS can figure out
 ##/sendPushNotificationBatch
 ### Send Push Notifications to list of patients [POST]
 
-optional if we have time
+optional if we have time, not sure anyone will use yet
 
 
 + Request 200 (application/json)
@@ -3236,6 +3261,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
                       "answers": [
                         {
                           question_cd: "QS1",
+                          question_group_code: "STUDYQUES",
                           question_type: "radio",
                           view_type: "view1",
                           answer_value: "4",
@@ -3287,6 +3313,7 @@ event 2, not sure
 
 ## FlareQuestionAnswer (object)
 + question_cd (string) - test
++ question_group_code (string) - usually STUDYQUES passed from mobile-app
 + question_type (string) - test
 + view_type (string) - test
 + answer_value (enum, nullable) - can be either a number key or string key (please don't add qoutes if a number)

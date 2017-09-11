@@ -3286,7 +3286,10 @@ event 2, not sure
 ## FlareResponse (object)
 + submission_order (number) - if offline, may have more than 1 offline answer to send up
 + submission_date (string) - date of submission
-+ answers (array[FlareQuestionAnswer]) - array of answers 
++ answers (array[FlareQuestionAnswer]) - array of answers
++ flare_status (string,optional)           - optional, since only offline submissions will have this info
++ flare_score (number,optional)            - optional, since only offline submissions will have this info
++ flare_score_alt_value (string, optional) - optional, since only offline submissions will have this info
 
 ## FlareQuestionAnswer (object)
 + question_cd (string) - test

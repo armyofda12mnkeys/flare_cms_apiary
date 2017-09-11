@@ -1996,19 +1996,11 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + user_reward_status
                 + badge_status
-                    + last_badge_won (RewardBadgeObject) - last badge won
                     + gained_badges (array[RewardBadgeObject]) - empty, not used
-                    + gained_badges_history (array[RewardBadgeObject]) - not sure this is needed so low priority
+                    + gained_badges_history (array[RewardBadgeObject]) - higher priority now since may be used on rewards listing page
                 + avatar_status
-                    + last_avatar_won (object) - last avatar/piece won
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + piece (RewardAvatarPieceObject)
-                    + gained_avatars (array[GainedAvatarObject]) - empty, not used
-                    + gained_avatars_history (object) - not sure this is needed so low priority
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + pieces (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[RewardAvatarObject]) - empty, not used
+                    + gained_avatars_history (array[RewardAvatarObject]) - higher priority now since may be used on rewards listing page
             + app_info
                 + latency_minutes (number) - this can probably be moved into study_info but im not very picky on this since its a true app configuration vs study... maybe we want to add more things in the future to the app_info
             + study_info
@@ -2140,19 +2132,11 @@ A little iffy on the acurian_services_data, for now copied from /login.
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + user_reward_status
                 + badge_status
-                    + last_badge_won (RewardBadgeObject) - last badge won
                     + gained_badges (array[RewardBadgeObject]) - empty, not used
-                    + gained_badges_history (array[RewardBadgeObject]) - not sure this is needed so low priority
+                    + gained_badges_history (array[RewardBadgeObject]) - higher priority now since may be used on rewards listing page
                 + avatar_status
-                    + last_avatar_won (object) - last avatar/piece won
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + piece (RewardAvatarPieceObject)
-                    + gained_avatars (array[GainedAvatarObject]) - empty, not used
-                    + gained_avatars_history (object) - not sure this is needed so low priority
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + pieces (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[RewardAvatarObject]) - empty, not used
+                    + gained_avatars_history (array[RewardAvatarObject]) - higher priority now since may be used on rewards listing page
             + app_info
                 + latency_minutes (number) - this can probably be moved into study_info but im not very picky on this since its a true app configuration vs study... maybe we want to add more things in the future to the app_info
             + study_info
@@ -2618,19 +2602,12 @@ note: will call AS WS /setFlareSurveyResponses
         + cms_data - 
             + user_reward_status
                 + badge_status
-                    + last_badge_won (RewardBadgeObject) - last badge won on this submission (or if none gained, the last badge won historically)
                     + gained_badges (array[RewardBadgeObject]) - badges won on this submission
-                    + gained_badges_history (array[RewardBadgeObject]) - not sure this is needed so low priority
+                    + gained_badges_history (array[RewardBadgeObject]) - mid priority, mobile app can use history from login but may be outdated so update here too
                 + avatar_status
-                    + last_avatar_won (object) - last avatar/piece won on this submission (or if none gained, the last avatar/piece won historically)
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + piece (RewardAvatarPieceObject)
-                    + gained_avatars (array[GainedAvatarObject]) - avatar/pieces won on this submission
-                    + gained_avatars_history (object) - not sure this is needed so low priority
-                        + avatar_id  (number)
-                        + avatar_name (string)
-                        + pieces (array[RewardAvatarPieceObject])
+                    + gained_avatars (array[RewardAvatarObject]) - avatar/pieces won on this submission
+                    + gained_avatars_history (array[RewardAvatarObject]) - mid priority, mobile app can use history from login but may be outdated so update here too
+
         + acurian_services_data - just passalong data, will have basically flare_status, flare_score, flare_score_alt_value for each response
         
     + Body
@@ -3386,7 +3363,7 @@ event 2, not sure
 + streak_days_to_win (number)
 
 
-## GainedAvatarObject
+## RewardAvatarObject
 + avatar_id  (number)
 + avatar_name (string)
 + pieces (array[RewardAvatarPieceObject]) - changed from pieces_won

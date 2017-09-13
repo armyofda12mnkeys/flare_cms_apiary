@@ -3219,7 +3219,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
     + Headers
 
             Authorization: Basic dynamicCMSApiUserPassGoesHere
-            external_app_name:  AS
+            external-app-name:  AS
             
     + Attributes
         + flare_user_id (string, optional) -    one of these 3 required, #1
@@ -3262,7 +3262,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
 ### Send Push Notifications [POST]
 
 find locale of the patient + find the translation group of his study which help figure out which message to serve him.
-Note: external_app_name should be passed via a HEADER so that CMS can figure out which Basic Auth to use for it.
+Note: external-app-name should be passed via a HEADER so that CMS can figure out which Basic Auth to use for it.
 Header set to string like 'AS' so 'AS' sent up from Acurian Services to check against our external Basic Auth cms api users.
 
 + Request 200 (application/json)
@@ -3270,7 +3270,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
     + Headers
     
             Authorization: Basic dynamicCMSApiUserPassGoesHere
-            external_app_name:  AS
+            external-app-name:  AS
             
     + Attributes
         + flare_user_id (string, optional) -    one of these 3 required, #1
@@ -3317,7 +3317,7 @@ optional if we have time, not sure anyone will use yet.
     + Headers
     
             Authorization: Basic dynamicCMSApiUserPassGoesHere
-            external_app_name:  AS
+            external-app-name:  AS
 
     + Attributes
         + flare_user_ids (string, optional)

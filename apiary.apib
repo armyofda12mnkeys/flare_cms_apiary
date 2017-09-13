@@ -2478,7 +2478,7 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
             }
 
 
-# Group Other important Group
+# Group Sending Flare Answers
 
 
 ## /sendFlareResponse
@@ -2673,6 +2673,79 @@ note: will call AS WS /setFlareSurveyResponses
             }
 
 
+
+##/updateProfileBaselineQuestions
+### Update Profile Baseline Questions [POST]
+
+Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
+???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion (look at dev-as, seems like passes an array of values)
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
+    + Attributes
+        + jwt_token (string) - test
+        + OS (string) - android or ios or (web)
+        + locale (string) - test
+        + fcm_token (string) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + preferred_screen_density - test
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
+        + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
+
+
+    + Body
+
+            {
+                "jwt_token": "abc123...",
+                "OS": "android"
+                "locale": "locale",
+                "fcm_token": "def456",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "ghi789",
+                "app_last_updated_date": "2017-05-14 13:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com"
+                "baseline_flare_responses": [ 
+                    {
+                      "submission_order": 1,
+                      "submission_date": "2017-05-21 13:00:00",
+                      "answers": [
+                        {
+                          question_cd: "QS1",
+                          question_group_code: "STUDYQUES",
+                          question_type: "radio",
+                          view_type: "view1",
+                          answer_value: "4",
+                          answer_value_list: null
+                        }
+                      ]
+                    }
+                ]
+            }
+    
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "status": "success",
+                "extra_info": "Baseline question(s) updated"
+            }
 
 # Group Reporting/Spectrum Graph web services
 
@@ -3132,9 +3205,10 @@ This is for CMS's 'Import Question' area. Already done, so url path may be diffe
         }
 
 
-# Group Other Web Services
-##/unflarePatient
-### Unflare Patient
+# Group External 3rd Party Web Services
+
+## /unflarePatient
+### Unflare Patient [POST]
 
 They have requested this WS not only just set the unflare_date_time in our streak table.
 But also send up push notification so they don't have to call 2 web services from their app.
@@ -3171,6 +3245,18 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
                 "unflare_date_time": "2017-01-31 13:30:00"
             }
 
++ Response 200 (application/json)
+
+
+    + Attributes
+        + request_status (RequestStatusObject)
+
+    + Body
+
+            {
+                "status": "success",
+                "extra_info": "Push notification sent to fcm token $token"
+            }
 
 ##/sendPushNotification
 ### Send Push Notifications [POST]
@@ -3265,78 +3351,6 @@ optional if we have time, not sure anyone will use yet.
                 "extra_info": "Push notifications sent to batch"
             }
 
-##/updateProfileBaselineQuestions
-### Update Profile Baseline Questions [POST]
-
-Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
-???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion (look at dev-as, seems like passes an array of values)
-
-+ Request 200 (application/json)
-
-    + Headers
-    
-            Authorization: Basic dynamicCMSApiUserPassGoesHere
-            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
-
-    + Attributes
-        + jwt_token (string) - test
-        + OS (string) - android or ios or (web)
-        + locale (string) - test
-        + fcm_token (string) - test
-        + app_name (string) - test
-        + app_version (string) - test
-        + cms_version (string) - test
-        + device_id (string) - test
-        + app_last_updated_date (string) - test
-        + preferred_screen_density - test
-        + flare_user_id (number) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
-
-
-    + Body
-
-            {
-                "jwt_token": "abc123...",
-                "OS": "android"
-                "locale": "locale",
-                "fcm_token": "def456",
-                "app_name": "default_flare_app",
-                "app_version": "v1",
-                "cms_version": "default"
-                "device_id": "ghi789",
-                "app_last_updated_date": "2017-05-14 13:00:00",
-                "preferred_screen_density": "android_mdpi",
-                "flare_user_id": 101,
-                "patient_id": 101010101,
-                "email": "test@acurian.com"
-                "baseline_flare_responses": [ 
-                    {
-                      "submission_order": 1,
-                      "submission_date": "2017-05-21 13:00:00",
-                      "answers": [
-                        {
-                          question_cd: "QS1",
-                          question_group_code: "STUDYQUES",
-                          question_type: "radio",
-                          view_type: "view1",
-                          answer_value: "4",
-                          answer_value_list: null
-                        }
-                      ]
-                    }
-                ]
-            }
-    
-+ Response 200 (application/json)
-
-    + Body
-
-            {
-                "status": "success",
-                "extra_info": "Baseline question(s) updated"
-            }
 
 # Group Low Priority, probably not needed:
 

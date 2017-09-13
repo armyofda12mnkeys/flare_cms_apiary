@@ -42,6 +42,10 @@ function register_v2(){ //in future this may exist
 
 + Request 200 (application/json)
 
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
     + Attributes
         + OS (string) - android or ios or (web)
         + locale (string, optional) - assume 'en' (or 'en_US') if none passed
@@ -246,6 +250,10 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
 
 + Request 200 (application/json)
 
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
     + Attributes
         + OS (string) - android or ios or (web)
         + locale (string, optional) - assume 'en' (or 'en_US') if none passed
@@ -311,6 +319,10 @@ Note: should call /resetFlareUserRegistrationKey AS service
 Some of these params below aren't needed but for now we agreed to always accept if they are available and sent up from the mobile-app (OS till app_last_updated_date for example)
 
 + Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
 
     + Attributes
         + OS (string) - 
@@ -454,6 +466,10 @@ Note: subscribe to FCM topics here as needed.
 Note: create a good patient schema here since we'll have the flare_user_id and things to related to it like device_id, fcm_token, etc.
 
 + Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
 
     + Attributes
         + OS (string) - android or ios or (web)
@@ -1896,7 +1912,11 @@ Note: and CMS should return the usual data all in inserts array since starting f
 Note: if the fcm_token is different than what we have for this device_id, i think it makes sense then inactivate the old one (in whatever device_id->fcm_token table we have) and insert new 'active' row
 
 + Request 200 (application/json)
+
+    + Headers
     
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
     + Attributes
         + OS (string) - android or ios or (web)
         + locale (string, optional) - assume 'en' (or 'en_US') if none passed
@@ -2022,6 +2042,12 @@ Note: I asked the mobile team to send up the badge_group_id and avatar_group_id 
 A little iffy on the acurian_services_data, for now copied from /login.
 
 + Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
     + Attributes
         + jwt_token (string) - passed from the mobile app back to CMS, CMS will check if its a valid jwt token, and if so allow the login, if fails need to send back error code in the request_status->errors array (make sure sure the error_code is unique so mobile-app can know what to)
         + OS (string) - android or ios or (web)
@@ -2156,6 +2182,11 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
 
 + Request 200 (application/json)
 
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
     + Attributes
         + jwt_token - since user already signed into mobile app, need to check if signed in
         + OS (string) - android or ios or (web)
@@ -2193,7 +2224,6 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
             }
             
 + Response 200 (application/json)
-
 
 
     + Attributes
@@ -2266,6 +2296,10 @@ Don't think jwt token is needed here, since you want user to click Forgot Passwo
 Note: should call /forgotFlareUserPwd AS service (seems like they are just confirming this email is valid to send a reset email to. That means we need to create a system to send emails and also a webform for that email's reset link to submit below /resetPassword). Please look at dev-as if you can to look at sample request.
 
 + Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
 
     + Attributes
         + OS (string) - android or ios or (web)
@@ -2367,6 +2401,10 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 
 + Request 200 (application/json)
     
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
     + Attributes
         + email
         + password
@@ -2449,6 +2487,11 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 note: will call AS WS /setFlareSurveyResponses
 
 + Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
         + jwt_token (string) - test
@@ -2639,6 +2682,11 @@ note: will call AS WS /setFlareSurveyResponses
 Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at dev-as if you can to look at sample request.
 
 + Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
         + jwt_token (string) - test
@@ -2836,6 +2884,11 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
 
 + Request (application/json)
 
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
     + Attributes
         + jwt_token (string) - test
         + OS (string) - android or ios or (web)
@@ -2949,6 +3002,11 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
 pull this data from the AS service: POST /getNumberPatientsSameScoreStatus (params: scoreNumValue, onDate )
 
 + Request (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
         + jwt_token (string) - test
@@ -3086,8 +3144,9 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
 
     + Headers
 
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
             external_app_name:  AS
-
+            
     + Attributes
         + flare_user_id (string, optional) -    one of these 3 required, #1
         + patient_id (string, optional) -       one of these 3 required, #2
@@ -3123,7 +3182,8 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
 + Request 200 (application/json)
     
     + Headers
-
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
             external_app_name:  AS
             
     + Attributes
@@ -3169,7 +3229,8 @@ optional if we have time, not sure anyone will use yet.
 + Request 200 (application/json)
 
     + Headers
-
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
             external_app_name:  AS
 
 
@@ -3211,6 +3272,11 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 ???Question???: Did Dmitriy define this AS WS counterpart yet? possibly is /setFlareSurveyBaselineQuestion (look at dev-as, seems like passes an array of values)
 
 + Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
         + jwt_token (string) - test
@@ -3271,7 +3337,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
                 "status": "success",
                 "extra_info": "Baseline question(s) updated"
             }
-    
+
 # Group Low Priority, probably not needed:
 
 

@@ -54,10 +54,6 @@ function register_v2(){ //in future this may exist
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + theme_id             (number, optional) - (very first time, nothing is passed) in case pre-login theme totally changed for app,             pass back everything for new theme in inserts array otherwise do normal inserts/updates/deletes check within the theme
         + translation_group_id (number, optional) - (very first time, nothing is passed) in case pre-login translation-group totally changed for app, pass back everything for new translation-group in inserts array otherwise do normal inserts/updates/deletes check within the translation-group
-
-    + Headers
-    
-            Accept-Charset: utf-8
     
     + Body
     
@@ -261,10 +257,6 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
         + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + registration_key - *** is there something else that can be used if they dont have activation key?
-        
-    + Headers
-    
-            Accept-Charset: utf-8
     
     + Body
     
@@ -476,10 +468,6 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
         + activation_key - *** is there something else that can be used if they dont have activation key?
         + email (string, required) - *** email from 
         + password (string, optional) - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
-    
-    + Headers
-    
-            Accept-Charset: utf-8
     
     + Body
     
@@ -1922,10 +1910,6 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
         + email - email is the mobile app's username
         + password - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
 
-    + Headers
-    
-            Accept-Charset: utf-8
-
     + Body
     
             {
@@ -3092,38 +3076,63 @@ This is for CMS's 'Import Question' area. Already done, so url path may be diffe
 
 # Group Other Web Services
 ##/unflarePatient
+### Unflare Patient
+
+They have requested this WS not only just set the unflare_date_time in our streak table.
+But also send up push notification so they don't have to call 2 web services from their app.
+Header set to string like 'AS' so 'AS' sent up from Acurian Services to check against our external Basic Auth cms api users.
+
++ Request 200 (application/json)
+
+    + Headers
+
+            external_app_name:  AS
+
     + Attributes
         + flare_user_id (string, optional) -    one of these 3 required, #1
         + patient_id (string, optional) -       one of these 3 required, #2
         + email (string, optional) -            one of these 3 required, #3
         + unflare_date_time (string) -  date time the user got unflared, please use 'YYYY-MM-DD HH:MM:SS' format unless you have your own standardized format
+        + message (string,optional) -                 one of these 2 required, #1 (this can be a backup in case no translation found for key below)
+        + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
+        + message_translation_group_id (number,optional) - if above is sent, need a translation group to use (note: AS Team requested to also be able to send the word 'default')
+        + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
+        + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
+        + theme_key_resolution (string, optional) -         if possible force the resolution of image to send. Not sure if this is needed, maybe we default to 'ldpi' for all ios/android?
 
     + Body
 
+
             {
                 "flare_user_id": 101,
-                "message_translation_group_id": 2,
-                "message_translation_key": "welcome_msg_to_app",
-                "message": "Welcome to this app!... This is the default text in case above key is not found",
+                "message_translation_group_id": 'default',
+                "message_translation_key": "unflare_message",
+                "message": "The Doctor said you have not met the criteria yet for this study. Please start taking the mobile app questionnaire daily to try to get into this study.",
+                "priority": "normal",
                 "unflare_date_time": "2017-01-31 13:30:00"
             }
 
-        
+
 ##/sendPushNotification
 ### Send Push Notifications [POST]
 
 find locale of the patient + find the translation group of his study which help figure out which message to serve him.
 Note: external_app_name should be passed via a HEADER so that CMS can figure out which Basic Auth to use for it.
+Header set to string like 'AS' so 'AS' sent up from Acurian Services to check against our external Basic Auth cms api users.
 
 + Request 200 (application/json)
+    
+    + Headers
 
+            external_app_name:  AS
+            
     + Attributes
         + flare_user_id (string, optional) -    one of these 3 required, #1
         + patient_id (string, optional) -       one of these 3 required, #2
         + email (string, optional) -            one of these 3 required, #3
         + message (string,optional) -                 one of these 2 required, #1 (this can be a backup in case no translation found for key below)
         + message_translation_key (string,optional) - one of these 2 required, #2 (possibly in future also get name of the Translation Group in this POST if want to have a easy-lookup message for array of patients, but for now make it smart to figure it out)
-        + message_translation_group_id (number,optional) - if above is sent, need a translation group to use
+        + message_translation_group_id (number,optional) - if above is sent, need a translation group to use (note: AS Team requested to also be able to send the word 'default')
         + priority (string, optional) -    default value is "normal", have to research what options are available in firebase
         + theme_key_notification_image (string, optional) - if possible, have ability to attach an image from the CMS theme system (otherwise may need to serve a default notification image)
         + theme_key_resolution (string, optional) -         if possible force the resolution of image to send. Not sure if this is needed, maybe we default to 'ldpi' for all ios/android?
@@ -3152,12 +3161,17 @@ Note: external_app_name should be passed via a HEADER so that CMS can figure out
             }
     
 ##/sendPushNotificationBatch
-### Send Push Notifications to list of patients [POST]
+### Send Push Notifications to list of patients - NOT NEEDED NOW BUT IN FUTURE MAY IMPLEMENT [POST]
 
-optional if we have time, not sure anyone will use yet
+optional if we have time, not sure anyone will use yet.
 
 
 + Request 200 (application/json)
+
+    + Headers
+
+            external_app_name:  AS
+
 
     + Attributes
         + flare_user_ids (string, optional)
@@ -3262,7 +3276,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 
 
 ## /sendUserTracking
-### send User Tracking [POST]
+### send User Tracking - NOT NEEDED NOW BUT IN FUTURE MAY IMPLEMENT [POST]
 event category button-click, screen-view... need to define these
 event 1, id-of-button, name-of-screen-view
 event 2, not sure

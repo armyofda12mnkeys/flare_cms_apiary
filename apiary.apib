@@ -2674,7 +2674,7 @@ note: will call AS WS /setFlareSurveyResponses
 
 
 
-##/updateProfileBaselineQuestions
+## /updateProfileBaselineQuestions
 ### Update Profile Baseline Questions [POST]
 
 Note: will pass an array of submissions/answers, but for now only 1 submission/answer will be in the array. basically a flare response.
@@ -2749,7 +2749,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 
 # Group Reporting/Spectrum Graph web services
 
-##/getFlareUserSpectrumGraph
+## /getFlareUserSpectrumGraph
 ### Get Flare User's Spectrum Graph [POST]
 
 Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at dev-as if you can to look at sample request.
@@ -2947,7 +2947,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
             }
 
 
-##/getFlareSurveyQuestionInfo
+## /getFlareSurveyQuestionInfo
 ### Get Flare Survey Question Info [POST]
 
 After clicking on a score above, will need to provide localized question text and localized answer.
@@ -3069,7 +3069,7 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
 
 
 
-##/getNumberPatientsSameScoreStatus
+## /getNumberPatientsSameScoreStatus
 ### Get Number of patients who are in the score/color-status as the Flare User [POST]
 
 pull this data from the AS service: POST /getNumberPatientsSameScoreStatus (params: scoreNumValue, onDate )
@@ -3258,7 +3258,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
                 "extra_info": "Unflared Patient and Push notification sent to fcm token $token"
             }
 
-##/sendPushNotification
+## /sendPushNotification
 ### Send Push Notifications [POST]
 
 find locale of the patient + find the translation group of his study which help figure out which message to serve him.
@@ -3306,7 +3306,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
                 "extra_info": "Push notification sent to fcm token $token"
             }
     
-##/sendPushNotificationBatch
+## /sendPushNotificationBatch
 ### Send Push Notifications to list of patients - NOT NEEDED NOW BUT IN FUTURE MAY IMPLEMENT [POST]
 
 optional if we have time, not sure anyone will use yet.

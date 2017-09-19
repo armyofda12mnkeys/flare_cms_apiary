@@ -3062,7 +3062,8 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
 ## /getNumberPatientsSameScoreStatus
 ### Get Number of patients who are in the score/color-status as the Flare User [POST]
 
-pull this data from the AS service: POST /getNumberPatientsSameScoreStatus (params: scoreNumValue, onDate )
+pull this data from the AS service: POST /getNumberPatientsSameScoreStatus (params: flareUserId OR scoreNumValue, onDate) 
+Note: we should now be just using the functionality where flareUserId is just needed since Mobile App team prefers to send up just this info.
 
 + Request (application/json)
 

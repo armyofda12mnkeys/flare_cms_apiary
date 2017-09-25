@@ -2539,21 +2539,29 @@ note: will call AS WS /setFlareSurveyResponses
                         {
                           question_cd: "QS1",
                           question_group_code: "STUDYQUES",
-                          question_type: "radio",
+                          question_type: "IRADIO",
                           view_type: "view1",
-                          answer_value: "4",
+                          answer_value: "1",
                           answer_value_list: null
                         },
                         {
                           question_cd: "QS2",
                           question_group_code: "STUDYQUES",
-                          question_type: "radio",
+                          question_type: "IRADIO",
                           view_type: "default",
-                          answer_value: "B",
+                          answer_value: "2",
                           answer_value_list: null
                         },
                         {
                           question_cd: "QS3",
+                          question_group_code: "STUDYQUES",
+                          question_type: "IRADIO",
+                          view_type: "default",
+                          answer_value: "3",
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS4",
                           question_group_code: "STUDYQUES",
                           question_type: "CHKBOX",
                           view_type: "default",
@@ -2561,11 +2569,11 @@ note: will call AS WS /setFlareSurveyResponses
                           answer_value_list: ["A", "4", "B", "5"]
                         },
                         {
-                          question_cd: "QS4",
+                          question_cd: "QS5",
                           question_group_code: "STUDYQUES",
-                          question_type: "IRADIO",
+                          question_type: "TXTNUM",
                           view_type: "default",
-                          answer_value: 200,
+                          answer_value: "200",
                           answer_value_list: null
                         }
                       ],
@@ -2577,15 +2585,15 @@ note: will call AS WS /setFlareSurveyResponses
                         {
                           question_cd: "QS1",
                           question_group_code: "STUDYQUES",
-                          question_type: "radio",
+                          question_type: "IRADIO",
                           view_type: "view1",
-                          answer_value: 5,
+                          answer_value: "5",
                           answer_value_list: null
                         },
                         {
                           question_cd: "QS2",
                           question_group_code: "STUDYQUES",
-                          question_type: "radio",
+                          question_type: "IRADIO",
                           view_type: "default",
                           answer_value: "C",
                           answer_value_list: null
@@ -2593,17 +2601,25 @@ note: will call AS WS /setFlareSurveyResponses
                         {
                           question_cd: "QS3",
                           question_group_code: "STUDYQUES",
-                          question_type: "checkbox",
+                          question_type: "IRADIO",
+                          view_type: "default",
+                          answer_value: "4",
+                          answer_value_list: null
+                        },
+                        {
+                          question_cd: "QS4",
+                          question_group_code: "STUDYQUES",
+                          question_type: "CHKBOX",
                           view_type: "default",
                           answer_value: null,
                           answer_value_list: ["A", "4"]
                         },
                         {
-                          question_cd: "QS4",
+                          question_cd: "QS5",
                           question_group_code: "STUDYQUES",
-                          question_type: "number",
+                          question_type: "TXTNUM",
                           view_type: "default",
-                          answer_value: 333,
+                          answer_value: "333",
                           answer_value_list: null
                         }
                       ],
@@ -2638,27 +2654,131 @@ note: will call AS WS /setFlareSurveyResponses
                 },
                 "acurian_services_data": {
                     apiResponse: {
-                        
-                        "flare_responses_results": [
-                            {
-                                //just based on order? or want submission_order?
-                                flare_status: "NOT_INFLARE",
-                                flare_score: 80,
-                                flare_score_alt_value: "ORANGE"
-                            },
-                            {
-                                flare_status: "NOT_INFLARE",
-                                flare_score: 60,
-                                flare_score_alt_value: "ORANGE"
-                            },
-                            {
-                                flare_status: "IN_FLARE",
-                                flare_score: -1,
-                                flare_score_alt_value: null
-                            }
-                        ]
-                        
-                    }
+                        FlareSurveyResponse: {
+                            surveyResponsesId: 0,
+                            patientId: 48363818,
+                            flareUserId: 411,
+                            followUpStudyId: 7055,
+                            isOffline: true,
+                            logicList: [
+                                "(QS2 - QS1 >= 4) && (QS3 >= 5)"
+                            ],
+                            scoreFormula: "(flareStatus==" IN_FLARE ") ? ((QS1+QS2+QS3/3 >= 0 && QS1+QS2+QS3/3 <= 7) ? 20 : (QS1+QS2+QS3/3 >= 8 && QS1+QS2+QS3/3 <= 16) ? 40 : (QS1+QS2+QS3/3 >= 17 && QS1+QS2+QS3/3 <= 23) ? 60 : 80) : -1",
+                            scoreAltMapping: [{
+                                    score: 20,
+                                    desc: "orange"
+                                }, {
+                                    score: 40,
+                                    desc: "yellow"
+                                }, {
+                                    score: 60,
+                                    desc: "green"
+                                }, {
+                                    score: 80,
+                                    desc: "blue"
+                                }
+                            ],
+                            flareSurveyResponseList: [{
+                                    submissionDate: "2017-09-23 15:05:05",
+                                    answersList: [{
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS1",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "1",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS2",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "2",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS3",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "3",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS4",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "CHKBOX",
+                                            value: null, -- not sure if empty or null for CHKBOX questions, ask AS team
+                                            optionsList: ["A", "4", "B", "5"]
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS5",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "TXTNUM",
+                                            value: "200",
+                                            optionsList: []
+                                        }
+                                    ],
+                                    flareStatus: "NOT_INFLARE",
+                                    flareScore: 60,
+                                    flareScoreAltValue: "yellow",
+                                    isSurveyEvaluated: true
+                                }, {
+                                    submissionDate: "2017-09-22 15:05:05",
+                                    answersList: [{
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS1",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "4",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS2",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "5",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS3",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "IRADIO",
+                                            value: "6",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS4",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "CHKBOX",
+                                            value: "333",
+                                            optionsList: []
+                                        }, {
+                                            surveyAnsRespId: 0,
+                                            qstnrElementUniqueCd: "QS5",
+                                            qstnrGroupAttributeCd: "STUDYQUES",
+                                            answerType: "TXTNUM",
+                                            value: null, -- not sure if empty or null for CHKBOX questions, ask AS team
+                                            optionsList: ["A", "4"]
+                                        }
+                                    ],
+                                    flareStatus: "NOT_INFLARE",
+                                    flareScore: 80,
+                                    flareScoreAltValue: "orange",
+                                    isSurveyEvaluated: true
+                                }
+                            ],
+                            startDate: null,
+                            endDate: null
+                        }
+                    },
+                    apiErrors: [{
+                            code: 200,
+                            status: "Success",
+                            message: "Success",
+                            moreInfo: "Success",
+                            httpStatus: "OK",
+                            versionInfo: "Supported"
+                        }
+                    ]
                 }
             }
 

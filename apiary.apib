@@ -3008,7 +3008,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                                 flareStatus: "NOT_INFLARE",
                                 flareScore: 80,
                                 flareScoreAltValue: "ORANGE",
-                                surveyAnsweres: [
+                                surveyAnswers: [
                                     {
                                         surveyAnsRespId: 150,
                                         qstnrElementUniqueCd: "QS3",
@@ -3194,14 +3194,18 @@ Note: we should now be just using the functionality where flareUserId is just ne
 
     + Attributes
         + jwt_token (string) - test
+        + OS (string) - android or ios or (web)
         + locale (string) - test
         + fcm_token (string) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + flare_user_id (number) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
         + device_id (string) - test
         + app_last_updated_date (string) - test
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
         + date_time (string, optional) - expect format like '2017-07-30 23:59:59', optonal since mobile team shouldnt supply anymore and we will use flare_user_id
         + score_number_value  (number, optional) - one of these two are required, #1 (preferably this one)
         + score_mapping_value (string, optional) - one of these two are required, #2
@@ -3485,6 +3489,61 @@ event 2, not sure
             "test": true
         }
 
+
+## /logout
+### Logout user
+will set a status on that device table, so that push notifications aren't accidentally still sent to that device for that user (but maybe another logged in user will have that same device activated for them so they should get the notifications)
+
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string) - test
+        + fcm_token (string) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
+        
+    + Body
+
+        
+            {
+                "OS": "android",
+                "locale": "en_US", 
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com"
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi"
+            }
+
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (RequestStatusObject)
+
+    + Body
+
+            {
+                "status": "success",
+                "extra_info": "Push notifications sent to batch"
+            }
 
 
 # Data Structures

@@ -564,6 +564,14 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                 + badge_trigger (string) - for now we only have 1 type of trigger, so using string for now. later we maybe have an id from the dropdown
                 + number_hours_maintain_streak_data (number)
                 + allow_interaction_with_app_if_in_flare (boolean)
+                + allow_gain_avatars_offline (boolean)
+                + allow_gain_badges_offline (boolean)
+                + allow_gain_same_badge_multiple_times (boolean)
+                + show_baseline_after_register (boolean)
+                + show_non_baseline_after_register (boolean)
+                + show_baseline_in_survey (boolean)
+                + editable_baseline_in_survey (boolean)
+                + show_baseline_link_in_settings (boolean)
                 + spectrum_graph_colors (array[SpectrumColorObject]) - hardcoded for now, we will make a CMS page later to collect this info which will build the spectrum graph dynamically
                 + patient_profile_score
                     + patient_profile_score_formula (string)
@@ -1442,6 +1450,14 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                         "badge_trigger": "Streak Data --Note: maybe this is an name like send_flare_response, confirm with CMS Team",
                         "number_hours_maintain_streak_data": 48,
                         "allow_interaction_with_app_if_in_flare": true
+                        "allow_gain_avatars_offline": false,
+                        "allow_gain_badges_offline": false,
+                        "allow_gain_same_badge_multiple_times": false,
+                        "show_baseline_after_register": true,
+                        "show_non_baseline_after_register": true,
+                        "show_baseline_in_survey": false;
+                        "editable_baseline_in_survey": false;
+                        "show_baseline_link_in_settings": true;
                         
                         "spectrum_graph_colors": [  
                            {
@@ -2005,6 +2021,14 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
                 + badge_trigger (string) - for now we only have 1 type of trigger, so using string for now. later we maybe have an id from the dropdown
                 + number_hours_maintain_streak_data (number)
                 + allow_interaction_with_app_if_in_flare (boolean)
+                + allow_gain_avatars_offline (boolean)
+                + allow_gain_badges_offline (boolean)
+                + allow_gain_same_badge_multiple_times (boolean)
+                + show_baseline_after_register (boolean)
+                + show_non_baseline_after_register (boolean)
+                + show_baseline_in_survey (boolean)
+                + editable_baseline_in_survey (boolean)
+                + show_baseline_link_in_settings (boolean)
                 + spectrum_graph_colors (array[SpectrumColorObject]) - hardcoded for now, we will make a CMS page later to collect this info which will build the spectrum graph dynamically
                 + patient_profile_score
                     + patient_profile_score_formula (string)
@@ -2147,6 +2171,14 @@ A little iffy on the acurian_services_data, for now copied from /login.
                 + badge_trigger (string) - for now we only have 1 type of trigger, so using string for now. later we maybe have an id from the dropdown
                 + number_hours_maintain_streak_data (number)
                 + allow_interaction_with_app_if_in_flare (boolean)
+                + allow_gain_avatars_offline (boolean)
+                + allow_gain_badges_offline (boolean)
+                + allow_gain_same_badge_multiple_times (boolean)
+                + show_baseline_after_register (boolean)
+                + show_non_baseline_after_register (boolean)
+                + show_baseline_in_survey (boolean)
+                + editable_baseline_in_survey (boolean)
+                + show_baseline_link_in_settings (boolean)
                 + spectrum_graph_colors (array[SpectrumColorObject]) - hardcoded for now, we will make a CMS page later to collect this info which will build the spectrum graph dynamically
                 + patient_profile_score
                     + patient_profile_score_formula (string)

@@ -315,7 +315,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
 ## /resetFlareUserRegistrationKey
 ### Reset (and possibly Generate) Flare Patient Registration Key  [POST]
 
-Note: should call /resetFlareUserRegistrationKey AS service
+Note: should call /resetFlareUserRegKey AS service (note: this used to be called /resetFlareUserRegistrationKey)
 Some of these params below aren't needed but for now we agreed to always accept if they are available and sent up from the mobile-app (OS till app_last_updated_date for example)
 
 + Request 200 (application/json)
@@ -333,13 +333,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
         + cms_version (string) - 
         + device_id (string, optional) - 
         + app_last_updated_date (string, optional) - 
-        + first_name (required)
-        + last_name (required)
-        + dob (required)
-        + address_1 (required)
-        + zip_code (required)
         + email (required)
-        + phone_number (required) - thought it was optional, but looks required. maybe ask for this if can't find patient?
 
     + Body 
 
@@ -353,13 +347,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
                 "device_id": "abc123def456ghi7890jklmnopqrstuv",
                 "app_last_updated_date": "2017-05-01 23:00:00",
                 
-                "first_name": "Acurian",
-                "last_name":"Trial",
-                "dob":"26-03-1973",
-                "phone_number":"123-456-7890",
-                "zip_code":"19044",
                 "email":"sample@acurian.com",
-                "address_1":"Street 12"
             }
 
     
@@ -2006,6 +1994,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + user_reward_status
                 + badge_status
+                    + current_badge_streak (number)
                     + gained_badges (array[RewardBadgeObject]) - empty, not used
                     + gained_badges_history (array[RewardBadgeObject]) - higher priority now since may be used on rewards listing page
                 + avatar_status
@@ -2156,6 +2145,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + user_reward_status
                 + badge_status
+                    + current_badge_streak (number)
                     + gained_badges (array[RewardBadgeObject]) - empty, not used
                     + gained_badges_history (array[RewardBadgeObject]) - higher priority now since may be used on rewards listing page
                 + avatar_status
@@ -2670,6 +2660,7 @@ note: will call AS WS /setFlareSurveyResponses
         + cms_data - 
             + user_reward_status
                 + badge_status
+                    + current_badge_streak (number)
                     + gained_badges (array[RewardBadgeObject]) - badges won on this submission
                     + gained_badges_history (array[RewardBadgeObject]) - mid priority, mobile app can use history from login but may be outdated so update here too
                 + avatar_status
@@ -3454,10 +3445,40 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
     + Body
 
             {
-                "status": "success",
-                "extra_info": "Push notification sent to fcm token $token"
+              "request_status": {
+                "status": "success"
+              },
+              "cms_data": {
+                "push_notifications": [
+                  {"device_id": 123, "fcm_token": "abc123",                                  "push_status": "Push notification sent to device" },
+                  {"device_id": 124, "fcm_token": "abc456", "error": "someExceptionIssue?",  "push_status": "Push notification sent to device" },
+                  {"device_id": 125, "fcm_token": "abc789",                                  "push_status": "Push notification sent to device" },
+                ]
+              },
+              "acurian_services_data": {}
             }
-    
+
++ Response 2000 (application/json)
+
+    + Attributes
+        + request_status (RequestStatusObject)
+
+            {
+              "request_status": {
+                "status": "success"
+              },
+              "cms_data": {
+                "push_notifications": [
+                  {"device_id": 123, "fcm_token": "abc123",                                  "push_status": "Push notification sent to device" },
+                  {"device_id": 124, "fcm_token": "abc456",  "error": "someExceptionIssue?", "push_status": "Push notification sent to device" },
+                  {"device_id": 125, "fcm_token": "abc789",                                  "push_status": "Push notification sent to device" },
+                ]
+              },
+              "acurian_services_data": {}
+            }
+
+
+
 ## /sendPushNotificationBatch
 ### Send Push Notifications to list of patients - NOT NEEDED NOW BUT IN FUTURE MAY IMPLEMENT [POST]
 
@@ -3665,6 +3686,7 @@ will set a status on that device table, so that push notifications aren't accide
 + badge_id (number)
 + badge_name (string)
 + streak_days_to_win (number)
++ won_counter (number)
 
 
 ## RewardAvatarObject

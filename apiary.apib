@@ -2032,37 +2032,6 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
 
 
 
-
-## /logout
-### Logout [POST]
-
-+ Request 200 (application/json)
-
-    + Headers
-    
-            Authorization: Basic dynamicCMSApiUserPassGoesHere
-            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
-
-    + Attributes
-        + jwt_token (string) - passed from the mobile app back to CMS, CMS will check if its a valid jwt token, and if so allow the login, if fails need to send back error code in the request_status->errors array (make sure sure the error_code is unique so mobile-app can know what to)
-        + OS (string) - android or ios or (web)
-        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
-        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
-        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
-        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
-        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
-        + device_id (string) - provide since already done on app 1st launch
-        + app_last_updated_date (string) - needs to get the latest info
-        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
-        + flare_user_id (number) - test
-        + patient_id (number) - test
-        + email (string) - test
-        + theme_id             - in case theme totally changed for user,             pass back everything for new theme in inserts array otherwise do normal inserts/updates/deletes check within the theme
-        + translation_group_id - in case translation-group totally changed for user, pass back everything for new translation-group in inserts array otherwise do normal inserts/updates/deletes check within the translation-group
-        + avatar_group_id      - in case avatar-group totally changed for user,      pass back everything for new avatar-group in inserts array otherwise do normal inserts/updates/deletes check within the avatar-group
-        + badge_group_id       - in case badge-group totally changed for user,       pass back everything for new badge-group in inserts array otherwise do normal inserts/updates/deletes check within the badge-group
-
-
 ## /authorization
 ### Authorization [POST]
 
@@ -2209,6 +2178,62 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value ). Looks like have to loop through that array to get the current status by getting the status which has currentChoice: "Y"
 
     
+
+
+## /logout
+### Logout user [POST]
+
+will set a status on that device table, so that push notifications aren't accidentally still sent to that device for that user (but maybe another logged in user will have that same device activated for them so they should get the notifications)
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string) - test
+        + fcm_token (string) - test
+        + app_name (string) - test
+        + app_version (string) - test
+        + cms_version (string) - test
+        + device_id (string) - test
+        + app_last_updated_date (string) - test
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + flare_user_id (number) - test
+        + patient_id (number) - test
+        + email (string) - test
+
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US", 
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com",
+                "app_last_updated_date": "2017-05-01 23:00:00",
+                "preferred_screen_density": "android_mdpi"
+            }
+            
++ Response 200 (application/json)
+
+    + Attributes
+        + request_status (RequestStatusObject)
+
+    + Body
+    
+            {
+                "not_sure_what_CMS_team_returning_yet": true
+            }
+
+
 
     
 # Group Password Group
@@ -3571,62 +3596,6 @@ event 2, not sure
         {
             "test": true
         }
-
-
-## /logout
-### Logout user
-will set a status on that device table, so that push notifications aren't accidentally still sent to that device for that user (but maybe another logged in user will have that same device activated for them so they should get the notifications)
-
-
-+ Request 200 (application/json)
-
-    + Headers
-    
-            Authorization: Basic dynamicCMSApiUserPassGoesHere
-
-    + Attributes
-        + OS (string) - android or ios or (web)
-        + locale (string) - test
-        + fcm_token (string) - test
-        + app_name (string) - test
-        + app_version (string) - test
-        + cms_version (string) - test
-        + device_id (string) - test
-        + app_last_updated_date (string) - test
-        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
-        + flare_user_id (number) - test
-        + patient_id (number) - test
-        + email (string) - test
-        
-    + Body
-
-        
-            {
-                "OS": "android",
-                "locale": "en_US", 
-                "fcm_token": "abc123...",
-                "app_name": "default_flare_app",
-                "app_version": "v1",
-                "cms_version": "default"
-                "device_id": "def124",
-                "flare_user_id": 101,
-                "patient_id": 101010101,
-                "email": "test@acurian.com"
-                "app_last_updated_date": "2017-05-01 23:00:00",
-                "preferred_screen_density": "android_mdpi"
-            }
-
-+ Response 200 (application/json)
-
-    + Attributes
-        + request_status (RequestStatusObject)
-
-    + Body
-
-            {
-                "status": "success",
-                "extra_info": "Push notifications sent to batch"
-            }
 
 
 # Data Structures

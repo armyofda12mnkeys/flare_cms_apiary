@@ -2184,12 +2184,14 @@ A little iffy on the acurian_services_data, for now copied from /login.
 ### Logout user [POST]
 
 will set a status on that device table, so that push notifications aren't accidentally still sent to that device for that user (but maybe another logged in user will have that same device activated for them so they should get the notifications)
+Note: unset the JWT Token after, since we need to authenticate whether you can logout your user (otherwise can just unset anyone's session)
 
 + Request 200 (application/json)
 
     + Headers
     
             Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
         + OS (string) - android or ios or (web)

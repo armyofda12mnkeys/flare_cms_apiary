@@ -2028,7 +2028,6 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to the patient_id from AS, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to the flare_user_id from AS value )
-            + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value ). Looks like have to loop through that array to get the current status by getting the status which has currentChoice: "Y"
 
 
 
@@ -2175,7 +2174,6 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to our patient_id, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to our flare_user_id value )
-            + patient_flare_status (object) - pull this data from the AS service: POST /getFlareUserRevisedStatuses (params: patientId ... correspond to our patient_id value ). Looks like have to loop through that array to get the current status by getting the status which has currentChoice: "Y"
 
     
 
@@ -3688,6 +3686,7 @@ event 2, not sure
 ## RewardAvatarObject
 + avatar_id  (number)
 + avatar_name (string)
++ order (number)
 + pieces (array[RewardAvatarPieceObject]) - changed from pieces_won
 
 ## RewardAvatarPieceObject

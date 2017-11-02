@@ -3471,6 +3471,7 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
 find locale of the patient + find the translation group of his study which help figure out which message to serve him.
 Note: external-app-name should be passed via a HEADER so that CMS can figure out which Basic Auth to use for it.
 Header set to string like 'AS' so 'AS' sent up from Acurian Services to check against our external Basic Auth cms api users.
+Note: you can pass variables to use in manual or automated push notifications via these params placed in the 'messsage' or the 'message_translation_key's value: ${patient.firstname}, ${patient.lastname}, ${patient.fullname}, ${date.todays_date}
 
 + Request 200 (application/json)
     

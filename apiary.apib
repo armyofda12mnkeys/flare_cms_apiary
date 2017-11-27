@@ -539,6 +539,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
+                + default_badge_translation_key (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -1296,10 +1297,12 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     "badges": {
                         "badge_group_id": 1,
                         "badge_group_name": "Trophy Badges",
+                        "default_badge_translation_key": "badge_streak_message_default",
                         "inserts": [{
                                 "badge_id": 1,
                                 "badge_name": "Bronze Trophy",
                                 "streak_days_to_win": 1,
+                                "badge_translation_key": "badge_streak_message_bronze_trophy",
                                 "file_urls": [{
                                         "badge_image_id": 1,
                                         "screen_density": "android_mdpi",
@@ -1342,6 +1345,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                 "badge_id": 2,
                                 "badge_name": "Silver Trophy",
                                 "streak_days_to_win": 3,
+                                "badge_translation_key": "badge_streak_message_silver_trophy",
                                 "file_urls": [{
                                         "badge_image_id": 10,
                                         "screen_density": "android_mdpi",
@@ -1384,6 +1388,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                 "badge_id": 3,
                                 "badge_name": "Gold Trophy",
                                 "streak_days_to_win": 5,
+                                "badge_translation_key": "badge_streak_message_gold_trophy",
                                 "file_urls": [{
                                         "badge_image_id": 19,
                                         "screen_density": "android_mdpi",
@@ -1989,6 +1994,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
+                + default_badge_translation_key (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -2135,6 +2141,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
+                + default_badge_translation_key (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -3628,7 +3635,7 @@ event 2, not sure
 + question_group_code (string) - usually STUDYQUES passed from mobile-app
 + question_type (string) - test
 + view_type (string) - test
-+ answer_value (enum, nullable) - can be either a number key or string key (please don't add qoutes if a number)
++ answer_value (enum, nullable) - can be either a number key or string key (please ***ADD*** qoutes though if a number [this changed from before])
     - 3 (number)
     - 'C' (string)
 + answer_value_list (array, nullable) - can be either a number key or string key (please don't add qoutes if a number in the array list)
@@ -3682,6 +3689,7 @@ event 2, not sure
 + badge_id (number)
 + badge_name (string)
 + streak_days_to_win (number)
++ badge_translation_key (string) - could be empty
 + file_urls (array[AvatarOrBadgePieceFileUrlObject])
 
 

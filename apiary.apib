@@ -85,9 +85,9 @@ function register_v2(){ //in future this may exist
             + theme_info (object) - return prelogin theme keys only!
                 + theme_id
                 + theme_name (string)
-                + is_inherited
-                + inherited_theme_id
-                + inherited_theme_name
+                + is_inherited (boolean)
+                + inherited_theme_id (number) - doesn't show up if is_inherited is false
+                + inherited_theme_name (string) - doesn't show up if is_inherited is false
                 + theme_values (object)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
@@ -95,6 +95,9 @@ function register_v2(){ //in future this may exist
             + translation_info (object) - return prelogin theme keys only!
                 + translation_group_id (number) - adding this in case want a quick check later on
                 + translation_group_name (string)
+                + is_inherited  (boolean)
+                + inherited_translation_group_id (number) - doesn't show up if is_inherited is false
+                + inherited_translation_group_name (string) - doesn't show up if is_inherited is false
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)
@@ -501,9 +504,9 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
-                + is_inherited
-                + inherited_theme_id
-                + inherited_theme_name
+                + is_inherited (boolean)
+                + inherited_theme_id (number) - doesn't show up if is_inherited is false
+                + inherited_theme_name (string) - doesn't show up if is_inherited is false
                 + theme_values (object)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
@@ -511,6 +514,9 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
             + translation_info (object) - filter post-login translation keys only!
                 + translation_group_id (number) - adding this in case want a quick check later on
                 + translation_group_name (string)
+                + is_inherited  (boolean)
+                + inherited_translation_group_id (number) - doesn't show up if is_inherited is false
+                + inherited_translation_group_name (string) - doesn't show up if is_inherited is false
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)
@@ -1956,9 +1962,9 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
-                + is_inherited
-                + inherited_theme_id
-                + inherited_theme_name
+                + is_inherited (boolean)
+                + inherited_theme_id (number) - doesn't show up if is_inherited is false
+                + inherited_theme_name (string) - doesn't show up if is_inherited is false
                 + theme_values (object)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
@@ -1966,6 +1972,9 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + translation_info (object) - filter post-login translation keys only!
                 + translation_group_id (number) - adding this in case want a quick check later on
                 + translation_group_name (string)
+                + is_inherited  (boolean)
+                + inherited_translation_group_id (number) - doesn't show up if is_inherited is false
+                + inherited_translation_group_name (string) - doesn't show up if is_inherited is false
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)
@@ -2103,9 +2112,9 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + theme_info (object) - filter post-login theme keys only!
                 + theme_id
                 + theme_name (string)
-                + is_inherited
-                + inherited_theme_id
-                + inherited_theme_name
+                + is_inherited (boolean)
+                + inherited_theme_id (number) - doesn't show up if is_inherited is false
+                + inherited_theme_name (string) - doesn't show up if is_inherited is false
                 + theme_values (object)
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
@@ -2113,6 +2122,9 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + translation_info (object) - filter post-login translation keys only!\
                 + translation_group_id (number) - adding this in case want a quick check later on
                 + translation_group_name (string)
+                + is_inherited  (boolean)
+                + inherited_translation_group_id (number) - doesn't show up if is_inherited is false
+                + inherited_translation_group_name (string) - doesn't show up if is_inherited is false
                 + translation_locale_key (string) - //pretend we send up en_AU but only en is available, i return the locale/lang/country info so app knows which locale or lang we got it from.
                 + translation_language (object)
                     + lang_code (string)

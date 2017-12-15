@@ -3440,10 +3440,7 @@ Note: we should now be just using the functionality where flareUserId is just ne
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object) - find the matching data in the Patient Profile Color Status mappings
-            + score_number_value (number) - if the request passes up the score #, figure out the text below
-            + score_mapping_value (string) - if the request passes up the mapped value, figure out the score above
-            + score_color (string) - hex color defined in the color status page
-            + translated_color (string) - get from their Translation Group, translate the key defined in the color status page
+            + patient_profile_score_mapping (array[PatientProfileScoreMappingObject])
         + acurian_services_data - just passalong data like below example
 
     + Body

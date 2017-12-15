@@ -545,7 +545,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_badge_translation_key (string) - could be empty too
+                + default_translation_key_badge_won (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -1303,7 +1303,7 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     "badges": {
                         "badge_group_id": 1,
                         "badge_group_name": "Trophy Badges",
-                        "default_badge_translation_key": "badge_streak_message_default",
+                        "default_translation_key_badge_won": "badge_streak_message_default",
                         "inserts": [{
                                 "badge_id": 1,
                                 "badge_name": "Bronze Trophy",
@@ -2003,7 +2003,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_badge_translation_key (string) - could be empty too
+                + default_translation_key_badge_won (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -2153,7 +2153,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_badge_translation_key (string) - could be empty too
+                + default_translation_key_badge_won (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -3807,6 +3807,7 @@ event 2, not sure
 + avatar_id (number)
 + avatar_name (string)
 + order (number)
++ translation_key_avatar_name (string)
 + pieces (array[AvatarPieceObject])
 
 ## AvatarPieceObject
@@ -3824,7 +3825,8 @@ event 2, not sure
 + badge_id (number)
 + badge_name (string)
 + streak_days_to_win (number)
-+ badge_translation_key (string) - could be empty
++ translation_key_badge_name (string) - could be empty
++ translation_key_badge_won (string) - could be empty
 + file_urls (array[AvatarOrBadgePieceFileUrlObject])
 
 

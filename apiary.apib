@@ -2046,6 +2046,57 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
 
 
 
+
+## /login/pure
+### Login [POST]
+
+Note: should authenticate user (via confirming user/pass via AS /authFlareUser) and issue jwt token
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+
+    + Attributes
+        + OS (string) - android or ios or (web)
+        + locale (string, optional) - assume 'en' (or 'en_US') if none passed
+        + fcm_token (string) - mobile app will give us an FCM Token to register for that device
+        + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
+        + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
+        + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + device_id (string) - provide since already done on app 1st launch
+        + app_last_updated_date (string) - 
+        + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
+        + email - email is the mobile app's username
+        + password - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
+
+    + Body
+    
+            {
+                "OS": "android",
+                "locale": "en_US",
+                "fcm_token": "abc123...",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "def124",
+                "app_last_updated_date": null,
+                "preferred_screen_density": "android_mdpi",
+                
+                "email": "test@hotmail.com",
+                "password": "md5(password@2!$test)"
+            }
+
+
++ Response 200 (application/json)
+   + Attributes
+        + request_status (RequestStatusObject)
+        + cms_data (object)
+            + jwt_token (string) - hmmm so if we can't call our own /login since it will return data as if you logged in for 1st time, then we have to call AS's login directly and get the jwt token here (also will issue one if user logs out and has to do a CMS /login)
+            + cms_app_last_updated_date (string) -
+
+
 ## /authorization
 ### Authorization [POST]
 
@@ -2300,7 +2351,7 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
                 "device_id": "def124",
                 "app_last_updated_date": "2017-05-01 23:00:00",
                 "preferred_screen_density": "android_mdpi",
-                "activation_key": "usertypingsomething",
+
                 "email": "test@hotmail.com",
                 "oldPassword": "oldPass123"
                 "newPassword": "newPass123"

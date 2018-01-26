@@ -539,13 +539,18 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
             + avatars
                 + avatar_group_id (number)
                 + avatar_group_name (string)
+                + fallback_translation_key_avatar_awarded (string) - lookup can fail
+                + fallback_translation_key_avatar_achieve_title (string)  - lookup can fail
+                + fallback_translation_key_avatar_achieve_body (string) - lookup can fail
                 + inserts (array[AvatarInsertOrUpdateObject])
                 + updates (array[AvatarInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_translation_key_badge_won (string) - could be empty too
+                + fallback_translation_key_badge_awarded (string) - could be empty too
+                + fallback_translation_key_badge_achieve_title (string) - could be empty too
+                + fallback_translation_key_badge_achieve_body (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -1111,10 +1116,16 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     "avatars": {
                         "avatar_group_id": 1,
                         "avatar_group_name": "Avatar Origami - Short Study",
+                        "fallback_translation_key_avatar_awarded": "default_avatar_awarded_message ... something like: Congratulations, you have unlocked reached level ${avatar_order}",
+                        "fallback_translation_key_avatar_achieve_title": "default_avatar_achieve_title_message ... something like: Level ${avatar_order}",
+                        "fallback_translation_key_avatar_achieve_body": "default_avatar_achieve_title_message ... something like: You are the ${avatar_name}",
                         "inserts": [{
                                 "avatar_id": 1,
                                 "avatar_name": "Bird Origami",
                                 "order": 1,
+                                "translation_key_avatar_name": "",
+                                "translation_key_avatar_achieve_title": "",
+                                "translation_key_avatar_achieve_title": "",
                                 "pieces": [{
                                         "piece_name": "outline",
                                         "true_index": 1,
@@ -1289,11 +1300,17 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                 "avatar_id": 2,
                                 "avatar_name": "Monkey Origami",
                                 "order": 2,
+                                "translation_key_avatar_name": "",
+                                "translation_key_avatar_achieve_title": "",
+                                "translation_key_avatar_achieve_title": "",
                                 "pieces": ["etc", "etc"]
                             }, {
                                 "avatar_id": 2,
                                 "avatar_name": "Giraffe Origami",
                                 "order": 2,
+                                "translation_key_avatar_name": "",
+                                "translation_key_avatar_achieve_title": "",
+                                "translation_key_avatar_achieve_title": "",
                                 "pieces": ["etc", "etc"]
                             }
                         ],
@@ -1303,12 +1320,17 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     "badges": {
                         "badge_group_id": 1,
                         "badge_group_name": "Trophy Badges",
-                        "default_translation_key_badge_won": "badge_streak_message_default",
+                        "fallback_translation_key_badge_awarded": "default_badge_awarded_message ... something like: Congratulations for reporting ${badge_streak_day} days in a row. Keep up the streak!",
+                        "fallback_translation_key_badge_achieve_title": "default_badge_achieve_title_message ... something like: ${badge_streak_day}-day streak",
+                        "fallback_translation_key_badge_achieve_body": "default_badge_achieve_body_message ... something like: You earned this award for answering your daily questions for ${badge_streak_day} consecutive days. Way to go!",
                         "inserts": [{
                                 "badge_id": 1,
                                 "badge_name": "Bronze Trophy",
                                 "streak_days_to_win": 1,
-                                "badge_translation_key": "badge_streak_message_bronze_trophy",
+                                "translation_key_badge_name": "",
+                                "translation_key_badge_awarded": "",
+                                "translation_key_badge_achieve_title": "",
+                                "translation_key_badge_achieve_body": "",
                                 "file_urls": [{
                                         "badge_image_id": 1,
                                         "screen_density": "android_mdpi",
@@ -1351,7 +1373,10 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                 "badge_id": 2,
                                 "badge_name": "Silver Trophy",
                                 "streak_days_to_win": 3,
-                                "badge_translation_key": "badge_streak_message_silver_trophy",
+                                "translation_key_badge_name": "",
+                                "translation_key_badge_awarded": "",
+                                "translation_key_badge_achieve_title": "",
+                                "translation_key_badge_achieve_body": "",
                                 "file_urls": [{
                                         "badge_image_id": 10,
                                         "screen_density": "android_mdpi",
@@ -1394,7 +1419,10 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                                 "badge_id": 3,
                                 "badge_name": "Gold Trophy",
                                 "streak_days_to_win": 5,
-                                "badge_translation_key": "badge_streak_message_gold_trophy",
+                                "translation_key_badge_name": "",
+                                "translation_key_badge_awarded": "",
+                                "translation_key_badge_achieve_title": "",
+                                "translation_key_badge_achieve_body": "",
                                 "file_urls": [{
                                         "badge_image_id": 19,
                                         "screen_density": "android_mdpi",
@@ -1997,13 +2025,18 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
             + avatars
                 + avatar_group_id (number)
                 + avatar_group_name (string)
+                + fallback_translation_key_avatar_awarded (string) - lookup can fail
+                + fallback_translation_key_avatar_achieve_title (string)  - lookup can fail
+                + fallback_translation_key_avatar_achieve_body (string) - lookup can fail
                 + inserts (array[AvatarInsertOrUpdateObject])
                 + updates (array[AvatarInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_translation_key_badge_won (string) - could be empty too
+                + fallback_translation_key_badge_awarded (string) - could be empty too
+                + fallback_translation_key_badge_achieve_title (string) - could be empty too
+                + fallback_translation_key_badge_achieve_body (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -2198,13 +2231,18 @@ A little iffy on the acurian_services_data, for now copied from /login.
             + avatars
                 + avatar_group_id (number)
                 + avatar_group_name (string)
+                + fallback_translation_key_avatar_awarded (string) - lookup can fail
+                + fallback_translation_key_avatar_achieve_title (string)  - lookup can fail
+                + fallback_translation_key_avatar_achieve_body (string) - lookup can fail
                 + inserts (array[AvatarInsertOrUpdateObject])
                 + updates (array[AvatarInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
             + badges
                 + badge_group_id (number)
                 + badge_group_name (string)
-                + default_translation_key_badge_won (string) - could be empty too
+                + fallback_translation_key_badge_awarded (string) - could be empty too
+                + fallback_translation_key_badge_achieve_title (string) - could be empty too
+                + fallback_translation_key_badge_achieve_body (string) - could be empty too
                 + inserts (array[BadgeInsertOrUpdateObject])
                 + updates (array[BadgeInsertOrUpdateObject])
                 + deletes (array[AvatarOrBadgeDeleteObject])
@@ -3857,7 +3895,9 @@ event 2, not sure
 + avatar_id (number)
 + avatar_name (string)
 + order (number)
-+ translation_key_avatar_name (string)
++ translation_key_avatar_name (string) - optional
++ translation_key_avatar_achieve_title (string) - optional
++ translation_key_avatar_achieve_title (string) - optional
 + pieces (array[AvatarPieceObject])
 
 ## AvatarPieceObject
@@ -3876,7 +3916,9 @@ event 2, not sure
 + badge_name (string)
 + streak_days_to_win (number)
 + translation_key_badge_name (string) - could be empty
-+ translation_key_badge_won (string) - could be empty
++ translation_key_badge_awarded (string) - optional
++ translation_key_badge_achieve_title (string) - optional
++ translation_key_badge_achieve_body (string) - optional
 + file_urls (array[AvatarOrBadgePieceFileUrlObject])
 
 

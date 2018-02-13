@@ -3112,7 +3112,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                 + patient_profile_score
                     + patient_profile_score_formula (string)
                     + patient_profile_score_mapping (array[PatientProfileScoreMappingObject])
-        + acurian_services_data (object) - just passalong data like below example
+        + acurian_services_data (object) - we passalong data like below example, and INJECT THE AVATAR information for that day (or last avatar won since that day... because mobile team needs an avatar image to show)
         TODO research adding badges and avatars here on a per 'ultimate day' basis
         
     + Body
@@ -3198,7 +3198,8 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                                 flareScoreAltValue: "ORANGE",
                                 user_reward_status: {
                                   avatar_status: {
-                                    is_avatar_copied_from_prev_submission: true, //add if offline
+                                    was_gained_on_another_day: true, //this could be set to true if offline
+                                    was_gained_on_another_day_date: '2017-01-01 12:34:45', //this could be set if offline
                                     gained_avatars: [{
                                       "avatar_id": 2,
                                       "avatar_name": "Cat",

@@ -2572,7 +2572,6 @@ Note: should call /forgotFlareUserPwd AS service (seems like they are just confi
 
 Above /forgotPassword will email a link to the user to rest their password. 
 User will click on that link and reset it, and then THIS /resetPassword ws is called.
-Important!: they expect CMS to create this reset-link webform which submits this request too! I guess this webform should be translatable as well based on a locale param.
 Don't think jwt token is needed here, since its being called from a webpage outside of mobile-app.
 Note: should call /resetFlareUserPwd AS service. Please look at dev-as if you can to look at sample request.
 Note: ask Dmitriy if this webpage form has or needs more security (i think i saw it passes just email as its param so i can type anyone's email to reset it).
@@ -2663,6 +2662,7 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 ### send Flare Response [POST]
 
 note: will call AS WS /setFlareSurveyResponses
+note: send up this Studies flag as allowedToTakeSurveyIfInFlare, true or false
 
 + Request (application/json)
 

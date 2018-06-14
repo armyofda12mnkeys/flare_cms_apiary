@@ -321,7 +321,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
 ## /resetFlareUserRegistrationKey
 ### Reset (and possibly Generate) Flare Patient Registration Key  [POST]
 
-Note: should call /resetFlareUserRegKey AS service (note: this used to be called /resetFlareUserRegistrationKey)
+Note: should call /sendFlareRegKeyResetLink (which in turn will call /resetFlareUserRegKey from clicking the email link) AS service (note: this used to be called old /resetFlareUserRegistrationKey WS directly which is incorrect)
 Some of these params below aren't needed but for now we agreed to always accept if they are available and sent up from the mobile-app (OS till app_last_updated_date for example)
 
 + Request 200 (application/json)

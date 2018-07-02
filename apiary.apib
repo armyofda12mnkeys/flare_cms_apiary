@@ -3048,6 +3048,49 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
                 "extra_info": "Baseline question(s) updated"
             }
 
+
+# Other
+
+## /hasViewedAppStudyMaterials 
+### Has Viewed App Study Materials [POST]
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
+    + Attributes
+        + material_id (number) - test
+        + material_type (string) - only possible values (app or study) 
+        
+    + Body
+
+            {
+                "material_id": "success",
+                "material_type": "study"
+            }
+
++ Response 200 (application/json)
+
+    ... not sure yet ...
+
+## /listViewedAppStudyMaterials
+### List Viewed App Study Materials [POST]
+***JWT token is also required.
+
++ Request 200 (application/json)
+
+    + Headers
+    
+            Authorization: Basic dynamicCMSApiUserPassGoesHere
+            JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
+
++ Response 200 (application/json)
+
+    ... not sure yet ...
+
 # Group Reporting/Spectrum Graph web services
 
 ## /getFlareUserSpectrumGraph

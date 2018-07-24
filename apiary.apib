@@ -80,6 +80,7 @@ function register_v2(){ //in future this may exist
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
+            + is_app_upgrade_needed: (boolean) - if true, then mobile app will block app usage and ask to upgrade app (or provide direct link to upgrade). maybe just /appLaunch?
             + cms_app_last_updated_date (string)
             + device_id (string)
             + theme_info (object) - return prelogin theme keys only!
@@ -117,6 +118,7 @@ function register_v2(){ //in future this may exist
                 "status": "success"
               },
               "cms_data": {
+                "is_app_upgrade_needed": false,
                 "cms_app_last_updated_date": "2017-01-10 23:45:12",
                 "device_id": "abc123def456ghi7890jklmnopqrstuv",
                 "theme_info":
@@ -3062,19 +3064,75 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
             JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
     + Attributes
-        + material_id (number) - test
-        + material_type (string) - only possible values (app or study) 
+        + app_name (string) - the only required field from the "default's sent by the app" needed for this
+        + viewed_materials (array[ViewedMaterial]) - viewed materials
         
     + Body
 
-            {
-                "material_id": 12,
-                "material_type": "study"
+
+            {   
+                "jwt_token": "abc123...",
+                "OS": "android"
+                "locale": "locale",
+                "fcm_token": "def456",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "ghi789",
+                "app_last_updated_date": "2017-05-14 13:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com", 
+                
+                "viewed_materials": [{
+                        "material_id": 1,
+                        "material_type": "study",
+                    },
+                    {
+                        "material_id": 1,
+                        "material_type": "app",
+                    },
+                    {
+                        "material_id": 2,
+                        "material_type": "study"
+                    }
+                ]
             }
 
 + Response 200 (application/json)
+    
+    + Body
 
-    ... not sure yet ...
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {
+                    "viewed_materials": [{
+                            "material_id": 1,
+                            "material_type": "study",
+                        },
+                        {
+                            "material_id": 1,
+                            "material_type": "app",
+                        },
+                        {
+                            "material_id": 2,
+                            "material_type": "study"
+                        },
+                        {
+                            "material_id": 3,
+                            "material_type": "app"
+                        },
+                        {
+                            "material_id": 4,
+                            "material_type": "study"
+                        }
+                    ]
+                },
+                "acurian_services_data": {}
+            }
 
 ## /listViewedAppStudyMaterials
 ### List Viewed App Study Materials [POST]
@@ -4034,6 +4092,10 @@ event 2, not sure
 + status (string) - usually 'success' but maybe 'error' ... if there is an error, this will say error, and include additional properties like these below 2 props
 + extra_info (optional) - eh , may helpful extra info even on success like "Push Notificatioon sent to fcm token $token"
 + errors (array[ErrorObject], optional) - array of errors
+
+## ViewedMaterial
++ material_id (number) - test
++ material_type (string) - only possible values (app or study) 
 
 ## ErrorObject
 + error_source (string) - "cms_error" or "acurian_services_error"

@@ -3104,6 +3104,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
     
     + Body
 
+
             {
                 "request_status": {
                     "status": "success"
@@ -3139,15 +3140,67 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
 ***JWT token is also required.
 
 + Request 200 (application/json)
-
+        
     + Headers
     
             Authorization: Basic dynamicCMSApiUserPassGoesHere
             JWT-Authorization: Bearer createdByCMSusedByMobileAppUntilExpiresAndNewOneThenIssuedAfterLogin
 
+    + Attributes
+        + app_name (string) - the only required field from the "default's sent by the app" needed for this
+
+    + Body
+
+
+            {   
+                "jwt_token": "abc123...",
+                "OS": "android"
+                "locale": "locale",
+                "fcm_token": "def456",
+                "app_name": "default_flare_app",
+                "app_version": "v1",
+                "cms_version": "default"
+                "device_id": "ghi789",
+                "app_last_updated_date": "2017-05-14 13:00:00",
+                "preferred_screen_density": "android_mdpi",
+                "flare_user_id": 101,
+                "patient_id": 101010101,
+                "email": "test@acurian.com" 
+            }
+
 + Response 200 (application/json)
 
-    ... not sure yet ...
+    + Body
+
+            {
+                "request_status": {
+                    "status": "success"
+                },
+                "cms_data": {
+                    "viewed_materials": [{
+                            "material_id": 1,
+                            "material_type": "study",
+                        },
+                        {
+                            "material_id": 1,
+                            "material_type": "app",
+                        },
+                        {
+                            "material_id": 2,
+                            "material_type": "study"
+                        },
+                        {
+                            "material_id": 3,
+                            "material_type": "app"
+                        },
+                        {
+                            "material_id": 4,
+                            "material_type": "study"
+                        }
+                    ]
+                },
+                "acurian_services_data": {}
+            }
 
 # Group Reporting/Spectrum Graph web services
 

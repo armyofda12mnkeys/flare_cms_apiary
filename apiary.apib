@@ -53,6 +53,7 @@ function register_v2(){ //in future this may exist
         + app_name (string) - machine name of app like 'default_flare_app' or 'pfizer_flare_app'
         + app_version (string) - examples: 'v1' or 'v1.5' or 'v2' 'v2.2' (do they want to just match on regex for example: 'v1\.1.*' and/or multiple versioning overrides per OS )
         + cms_version (string) - 'default' or 'v2', which pretend would correspond with login() and login_v2() respectively in the cms
+        + mobile_app_version (string) - a value like '1.2.1' sent up by mobile team, which will help us calc if is_app_upgrade_needed needs to be true
         + device_id (string, optional) - *** provide if already gotton on app's 1st launch (response won't issue a new device_id, if one already passed up)
         + app_last_updated_date (string, optional) - *** needs to get the latest info so supply on subsequent launches... optional since we'll know if its empty string or missing to view this also as very first launch and all keys should be in inserts array
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)

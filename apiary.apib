@@ -4004,6 +4004,62 @@ event 2, not sure
         }
 
 
+
+# Group 'Is CMS/AcurianServices Up' api calls
+
+
+## /isFlareCMSUp
+### isFlareCMSUp [GET]
+A GET test with no Basic Authentication and returns SUCCESS JSON response text.
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+## /isFlareCMSDatabaseUp
+### isFlareCMSDatabaseUp [POST]
+w/ Basic Auth
+A POST test with Basic Auth and that also connect to DB and returns some basic info from DB in JSON format.(Using our generic basic-auth password coded into .env file).
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
+## /isASUp
+### isASUp [GET]
+A GET test that hits AS and returns that data. Hitting ‘https://dev-as.acurian.com/as/api/Flare/v1/getFlareMatchingStudy/A’ and just returning what this A.S. returns.
+
++ Request 200 (application/json)
+
+        {
+            "test": true
+        }
+    
++ Response 200 (application/json)
+
+        {
+            "test": true
+        }
+
+
 # Data Structures
 
 ## FlareResponse (object)

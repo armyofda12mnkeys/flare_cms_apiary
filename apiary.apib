@@ -59,9 +59,9 @@ function register_v2(){ //in future this may exist
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + theme_id             (number, optional) - (very first time, nothing is passed) in case pre-login theme totally changed for app,             pass back everything for new theme in inserts array otherwise do normal inserts/updates/deletes check within the theme
         + translation_group_id (number, optional) - (very first time, nothing is passed) in case pre-login translation-group totally changed for app, pass back everything for new translation-group in inserts array otherwise do normal inserts/updates/deletes check within the translation-group
-    
+
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -81,7 +81,7 @@ function register_v2(){ //in future this may exist
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
-            + is_app_upgrade_needed: (boolean) - if true, then mobile app will block app usage and ask to upgrade app (or provide direct link to upgrade). maybe just /appLaunch?
+            + is_app_upgrade_needed (boolean) - if true, then mobile app will block app usage and ask to upgrade app ... or provide direct link to upgrade. maybe just /appLaunch?
             + cms_app_last_updated_date (string)
             + device_id (string)
             + theme_info (object) - return prelogin theme keys only!
@@ -111,9 +111,9 @@ function register_v2(){ //in future this may exist
                     + inserts (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + updates (array[TranslationOrThemeKeyValueInsertOrUpdateObject])
                     + deletes (array[TranslationOrThemeKeyValueDeleteObject])
-                
+
     + Body
-        
+
             {
               "request_status": {
                 "status": "success"
@@ -274,9 +274,9 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
         + app_last_updated_date (string, optional) - needs to get the latest info so supply on subsequent launches
         + preferred_screen_density - *** not sure if will be used yet *** android_mdpi, ios_1x, original (possibly for Badge and Avatar urls or i pass all urls and mobile-app can decide which one to use)
         + registration_key - *** is there something else that can be used if they dont have activation key?
-    
+
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -296,7 +296,7 @@ Note: the response can be something like: RegistrationKeyValidation: "EXPIRED" o
         + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data
-        
+
     + Body
 
             {
@@ -344,7 +344,7 @@ Some of these params below aren't needed but for now we agreed to always accept 
         + app_last_updated_date (string, optional) - 
         + email (required)
 
-    + Body 
+    + Body
 
             {
                 "OS": "android",
@@ -361,12 +361,12 @@ Some of these params below aren't needed but for now we agreed to always accept 
 
     
 + Response 200 (application/json)
-    
+
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data
-        
+
     + Body
 
             {
@@ -481,9 +481,9 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
         + activation_key - *** is there something else that can be used if they dont have activation key?
         + email (string, required) - *** email from 
         + password (string, optional) - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
-    
+
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -586,8 +586,9 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                     + questions (array[QuestionColorImageMappingObject])
         + acurian_services_data (object)
             + patient_info (object) - pull this data from the AS service: POST /registerFlareUser (params: emailID, phoneNumber, password, registrationKey, languagePref ... correspond to our values: email, phone_number, password, activation_key, locale)
+            + site_info (object) - pull this data form the AS service: POST /getFlareSiteInfoByPatientId
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey
-        
+
     + Body
 
             {
@@ -1751,6 +1752,42 @@ Note: create a good patient schema here since we'll have the flare_user_id and t
                             }
                         ]
                     },
+                    "site_info": {
+                        "apiResponse": {
+                            "site": {
+                                "facilityName": "Acurian",
+                                "address1": "2 Walnut Grove Drive",
+                                "address2": "Suite 375",
+                                "city": "Horsham",
+                                "state": "PA",
+                                "zipCode": "19044",
+                                "zipExt": null,
+                                "country": "US",
+                                "timeZoneCd": "EST",
+                                "latitude": 40.1693195,
+                                "longitude": -75.1430636,
+                                "language": "en",
+                                "siteInvestigatorInfo": {
+                                    "firstName": "Jennifer",
+                                    "lastName": "Boucher",
+                                    "phoneNumber": "2153239000",
+                                    "phoneExt": null,
+                                    "faxNumber": "2153239001",
+                                    "email": "laura.vesey@acurian.com"
+                                }
+                            }
+                        },
+                        "apiErrors": [
+                            {
+                                "code": 200,
+                                "status": "Success",
+                                "message": "Success",
+                                "moreInfo": "Success",
+                                "httpStatus": "OK",
+                                "versionInfo": "Supported"
+                            }
+                        ]
+                    },
                     "survey_info": {
                         "apiResponse": {
                             "FlareSurvey": {
@@ -1973,7 +2010,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
         + password - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
 
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -1991,6 +2028,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
 
 
 + Response 200 (application/json)
+
    + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
@@ -2083,6 +2121,7 @@ Note: if the fcm_token is different than what we have for this device_id, i thin
                     + questions (array[QuestionColorImageMappingObject])
         + acurian_services_data (object)
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
+            + site_info (object) - pull this data form the AS service: POST /getFlareSiteInfoByPatientId
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to the patient_id from AS, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to the flare_user_id from AS value )
 
@@ -2114,7 +2153,7 @@ Note: should authenticate user (via confirming user/pass via AS /authFlareUser) 
         + password - *** Note: any password inputs I believe will always be md5-ed be4 they get to us
 
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -2132,6 +2171,7 @@ Note: should authenticate user (via confirming user/pass via AS /authFlareUser) 
 
 
 + Response 200 (application/json)
+
    + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
@@ -2173,9 +2213,8 @@ A little iffy on the acurian_services_data, for now copied from /login.
         + avatar_group_id      (number) - in case avatar-group totally changed for user,      pass back everything for new avatar-group in inserts array otherwise do normal inserts/updates/deletes check within the avatar-group
         + badge_group_id       (number) - in case badge-group totally changed for user,       pass back everything for new badge-group in inserts array otherwise do normal inserts/updates/deletes check within the badge-group
 
-
     + Body
-    
+
             {
                 "jwt_token": "abc123..",
                 "OS": "android",
@@ -2198,6 +2237,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
             }
             
 + Response 200 (application/json)
+
    + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
@@ -2289,6 +2329,7 @@ A little iffy on the acurian_services_data, for now copied from /login.
                     + questions (array[QuestionColorImageMappingObject])
         + acurian_services_data (object)
             + patient_info (object) - pull this data from the AS service: POST /authFlareUser (params: emailID, password ... correspond to our values: email, password)
+            + site_info (object) - pull this data form the AS service: POST /getFlareSiteInfoByPatientId
             + survey_info (object)  - pull this data from the AS service: GET /getFlareSurvey (params: patientId, languagePref ... correspond to our patient_id, and locale values)
             + baseline_answers (object) - pull this data from the AS service: POST /getFlareSurveyBaselineQuestion (params: flareUserId ... correspond to our flare_user_id value )
 
@@ -2323,7 +2364,7 @@ Note: unset the JWT Token after, since we need to authenticate whether you can l
         + email (string) - test
 
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US", 
@@ -2345,7 +2386,7 @@ Note: unset the JWT Token after, since we need to authenticate whether you can l
         + request_status (RequestStatusObject)
 
     + Body
-    
+
             {
                 "not_sure_what_CMS_team_returning_yet": true
             }
@@ -2384,9 +2425,9 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
         + email (string) - test
         + oldPassword (string)
         + newPassword (string)
-        
+
     + Body
-    
+
             {
                 "jwt_token": "abc123",
                 "OS": "android",
@@ -2405,14 +2446,13 @@ Note: should call /changeFlareUserPwd AS service. Please look at dev-as if you c
             
 + Response 200 (application/json)
 
-
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data - just passalong data like below example
-        
+
     + Body
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -2494,7 +2534,7 @@ Note: should call /forgotFlareUserPwd AS service (seems like they are just confi
         + email
 
     + Body
-    
+
             {
                 "OS": "android",
                 "locale": "en_US",
@@ -2514,9 +2554,9 @@ Note: should call /forgotFlareUserPwd AS service (seems like they are just confi
         + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data - just passalong data like below example
-        
+
     + Body
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -2590,7 +2630,7 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
         + password
 
     + Body 
-    
+
             {
                 "email": "test@hotmail.com",
                 "password": "pass123"
@@ -2602,9 +2642,9 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
         + request_status (RequestStatusObject)
         + cms_data - empty
         + acurian_services_data - just passalong data like below example
-        
+
     + Body
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -2667,7 +2707,7 @@ Note: ask Dmitriy if this webpage form has or needs more security (i think i saw
 note: will call AS WS /setFlareSurveyResponses
 note: send up this Studies flag as allowedToTakeSurveyIfInFlare, true or false
 
-+ Request (application/json)
++ Request 200 (application/json)
 
     + Headers
     
@@ -2693,7 +2733,6 @@ note: send up this Studies flag as allowedToTakeSurveyIfInFlare, true or false
         + flare_responses (array[FlareResponse]) -
 
     + Body
-
 
             {
                 "jwt_token": "abc123",
@@ -2836,9 +2875,9 @@ note: send up this Studies flag as allowedToTakeSurveyIfInFlare, true or false
                     + gained_avatars_history (array[RewardAvatarObject]) - mid priority, mobile app can use history from login but may be outdated so update here too
 
         + acurian_services_data - just passalong data, will have basically flare_status, flare_score, flare_score_alt_value for each response
-        
+
     + Body
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -3007,7 +3046,6 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
         + email (string) - test
         + baseline_flare_responses (array[FlareResponse]) - for now same structure as sendFlareResponse... assume only 1 submission and only 1 answer within that submission (but for consistancy left as array of submissions and array of answers in case in future can submit multiple questions at one time and/or multiple submissions[less likely since baseline probably won't support offline mode])
 
-
     + Body
 
             {
@@ -3052,7 +3090,7 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
             }
 
 
-# Other
+# Group Other
 
 ## /hasViewedAppStudyMaterials 
 ### Has Viewed App Study Materials [POST]
@@ -3067,9 +3105,8 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
     + Attributes
         + app_name (string) - the only required field from the "default's sent by the app" needed for this
         + viewed_materials (array[ViewedMaterial]) - viewed materials
-        
-    + Body
 
+    + Body
 
             {   
                 "jwt_token": "abc123...",
@@ -3102,9 +3139,8 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
             }
 
 + Response 200 (application/json)
-    
-    + Body
 
+    + Body
 
             {
                 "request_status": {
@@ -3151,7 +3187,6 @@ Note: will pass an array of submissions/answers, but for now only 1 submission/a
         + app_name (string) - the only required field from the "default's sent by the app" needed for this
 
     + Body
-
 
             {   
                 "jwt_token": "abc123...",
@@ -3233,11 +3268,9 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
         + email (string) - test
         + number_of_records (number) -
         + end_date (string) - note: AS expects this format: '6/27/2017', please convert from our normal format: '2017-06-27'
-        
 
     + Body
 
-        
             {
                 "jwt_token": "abc123...",
                 "OS": "android",
@@ -3259,6 +3292,7 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
 
 
 + Response 200 (application/json)
+
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object)
@@ -3272,9 +3306,9 @@ Note: should call /getFlareSurveyHistoricalResponses AS service. Please look at 
                     + patient_profile_score_mapping (array[PatientProfileScoreMappingObject])
         + acurian_services_data (object) - we passalong data like below example, and INJECT THE AVATAR information for that day (or last avatar won since that day... because mobile team needs an avatar image to show)
         TODO research adding badges and avatars here on a per 'ultimate day' basis
-        
+
     + Body
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -3449,10 +3483,9 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
         + patient_id (number) - test
         + email (string) - test
         + date (string) - format '2017-01-31' but send up to AS in their format '01/31/2017 ('mm/dd/yyyy')
-    
+
     + Body
-    
-    
+
     
 + Response 200 (application/json)
 
@@ -3460,10 +3493,8 @@ Note: AS Team may slightly modify above to be /getFlareSurveyQuestionInfoByUserD
         + request_status (RequestStatusObject)
         + cms_data (object) - empty
         + acurian_services_data - just passalong data like below example
- 
 
     + Body
-
 
             {
                 "request_status": {
@@ -3571,11 +3602,9 @@ Note: we should now be just using the functionality where flareUserId is just ne
         + date_time (string, optional) - do not use anymore. expect format like '2017-07-30 23:59:59', optonal since mobile team shouldnt supply anymore and we will use flare_user_id
         + score_number_value  (number, optional) - do not use anymore. one of these two are required, #1 (preferably this one)
         + score_mapping_value (string, optional) - do not use anymore. one of these two are required, #2
-        
 
     + Body
 
-        
             {
                 "jwt_token": "abc123...",
                 "OS": "android",
@@ -3593,6 +3622,7 @@ Note: we should now be just using the functionality where flareUserId is just ne
             }
 
 + Response 200 (application/json)
+
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object) - find the matching data in the Patient Profile Color Status mappings
@@ -3603,8 +3633,7 @@ Note: we should now be just using the functionality where flareUserId is just ne
         + acurian_services_data - just passalong data like below example
 
     + Body
-    
-    
+
             {
                 "request_status": {
                     "status": "success"
@@ -3666,10 +3695,9 @@ Note: we should now be just using the functionality where flareUserId is just ne
         + flare_user_id (number) - really we only need something unique about patient to send up to AS for this WS
         + patient_id (number) - really we only need something unique about patient to send up to AS for this WS
         + email (string) - really we only need something unique about patient to send up to AS for this WS
-        
+
     + Body
 
-        
             {
                 "jwt_token": "abc123...",
                 "OS": "android",
@@ -3687,6 +3715,7 @@ Note: we should now be just using the functionality where flareUserId is just ne
             }
 
 + Response 200 (application/json)
+
     + Attributes
         + request_status (RequestStatusObject)
         + cms_data (object) - find the matching data in the Patient Profile Color Status mappings
@@ -3694,7 +3723,7 @@ Note: we should now be just using the functionality where flareUserId is just ne
         + acurian_services_data - just passalong data like below example
 
     + Body
-    
+
             {
                 cms_data: {                             
                     "patient_profile_score_mapping": [            
@@ -3776,16 +3805,18 @@ This is for CMS's 'Add/Edit Study' area
         + partial_project_code (string) - test
 
     + Body
-    
+
             {
                 "test": true
             }
     
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+
+            {
+                "test": true
+            }
 
 ## /importQuestions
 ### Import Questions [POST]
@@ -3794,15 +3825,19 @@ This is for CMS's 'Import Question' area. Already done, so url path may be diffe
 
 + Request 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+
+            {
+                "test": true
+            }
     
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+
+            {
+                "test": true
+            }
 
 
 # Group External 3rd Party Web Services
@@ -3835,7 +3870,6 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
 
     + Body
 
-
             {
                 "flare_user_id": 101,
                 "message_translation_group_id": 'default',
@@ -3846,7 +3880,6 @@ Header set to string like 'AS' so 'AS' sent up from Acurian Services to check ag
             }
 
 + Response 200 (application/json)
-
 
     + Attributes
         + request_status (RequestStatusObject)
@@ -3993,15 +4026,19 @@ event 2, not sure
 
 + Request 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
     
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
 
 
 
@@ -4014,15 +4051,19 @@ A GET test with no Basic Authentication and returns SUCCESS JSON response text.
 
 + Request 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
     
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
 
 
 ## /isFlareCMSDatabaseUp
@@ -4032,15 +4073,19 @@ A POST test with Basic Auth and that also connect to DB and returns some basic i
 
 + Request 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
     
 + Response 200 (application/json)
 
-        {
-            "test": true
-        }
+    + Body
+    
+            {
+                "test": true
+            }
 
 
 ## /isASUp
